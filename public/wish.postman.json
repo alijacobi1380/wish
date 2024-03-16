@@ -13,6 +13,9 @@
 				{
 					"name": "Login",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -26,7 +29,7 @@
 							"formdata": [
 								{
 									"key": "email",
-									"value": "dsadas@gmail.com",
+									"value": "ashkan@gmail.com",
 									"type": "text"
 								},
 								{
@@ -37,19 +40,62 @@
 							]
 						},
 						"url": {
-							"raw": "http://192.168.108.107:8000/api/v1/login",
-							"protocol": "http",
+							"raw": "192.168.1.4:8000/api/v1/login",
 							"host": [
 								"192",
 								"168",
-								"108",
-								"107"
+								"1",
+								"4"
 							],
 							"port": "8000",
 							"path": [
 								"api",
 								"v1",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "9|9F57yTJVqwgNjFtbYcagNyZmCzf8ueM9wczVkEXG9adc4d9e",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://192.168.1.4:8000/api/v1/logout",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"4"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"logout"
 							]
 						}
 					},
@@ -71,12 +117,12 @@
 							"formdata": [
 								{
 									"key": "name",
-									"value": "aliygh",
+									"value": "ashkan",
 									"type": "text"
 								},
 								{
 									"key": "email",
-									"value": "aliygh80803@gmail.com",
+									"value": "ashkan@gmail.com",
 									"type": "text"
 								},
 								{
@@ -86,35 +132,124 @@
 								},
 								{
 									"key": "phone",
-									"value": "09221314764",
+									"value": "09185234506",
 									"type": "text"
 								},
 								{
 									"key": "role",
-									"value": "Admin",
-									"description": "Admin\nCompany\nClient\nMovieMaker",
+									"value": "Company",
+									"description": "Admin\nCompany\nClient\nFilmMaker",
 									"type": "text"
 								},
 								{
 									"key": "lastname",
 									"value": "yaghoobi",
 									"type": "text"
+								},
+								{
+									"key": "companycode",
+									"value": "12345678",
+									"type": "text"
+								},
+								{
+									"key": "companyname",
+									"value": "dasda",
+									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "192.168.108.107:8000/api/v1/register",
+							"raw": "192.168.1.4:8000/api/v1/register",
 							"host": [
 								"192",
 								"168",
-								"108",
-								"107"
+								"1",
+								"4"
 							],
 							"port": "8000",
 							"path": [
 								"api",
 								"v1",
 								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserData",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "16|woHIklkQ1CNRMBUvIC5AMPKsag1fsReXu0mbus048f5c761a",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://192.168.1.4:8000/api/v1/user",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"4"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "GetUsers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "4|tzgArjMJNuOlilcuCVc3ZvXNCWn3m2MKeiei6FlXfe76e745",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "192.168.1.4:8000/api/v1/admin/getusers",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"4"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"getusers"
 							]
 						}
 					},

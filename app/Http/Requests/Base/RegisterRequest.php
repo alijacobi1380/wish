@@ -24,6 +24,8 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'required',
             'lastname' => 'required',
+            'companyname' => 'required_if:role,==,Company',
+            'companycode' => 'required_if:role,==,Company|numeric|digits:8',
             'phone' => 'required|numeric|min:11|unique:users,phone',
             'role' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -31,21 +33,21 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    function messages()
-    {
-        return [
-            'name.required' => 'لطفا نام را وارد نمایید',
-            'lastname.required' => 'لطفا نام خانوادگی را وارد نمایید',
-            'phone.required' => 'لطفا تلفن همراه را وارد نمایید',
-            'phone.unique' => 'این شماره تلفن قبلا استفاده شده است',
-            'phone.numeric' => 'لطفا تلفن همراه را به صورت صحیح وارد نمایید',
-            'phone.min' => 'لطفا تلفن همراه را به صورت صحیح وارد نمایید',
-            'role.required' => 'لطفا نقش را وارد نمایید',
-            'email.required' => 'لطفا ایمیل را وارد نمایید',
-            'email.email' => 'فرمت ایمیل صحیح نیست',
-            'email.unique' => 'این ایمیل قبلا استفاده شده است',
-            'password.required' => 'رمز عبور را وارد نمایید',
-            'password.min' => 'رمز عبور باید حداقل ۸ حرف باشد',
-        ];
-    }
+    // function messages()
+    // {
+    //     return [
+    //         'name.required' => 'لطفا نام را وارد نمایید',
+    //         'lastname.required' => 'لطفا نام خانوادگی را وارد نمایید',
+    //         'phone.required' => 'لطفا تلفن همراه را وارد نمایید',
+    //         'phone.unique' => 'این شماره قبلا استفاده شده است',
+    //         'phone.numeric' => 'لطفا تلفن همراه را به صورت صحیح وارد نمایید',
+    //         'phone.min' => 'لطفا تلفن همراه را به صورت صحیح وارد نمایید',
+    //         'role.required' => 'لطفا نقش را وارد نمایید',
+    //         'email.required' => 'لطفا ایمیل را وارد نمایید',
+    //         'email.email' => 'فرمت ایمیل صحیح نیست',
+    //         'email.unique' => 'این ایمیل قبلا استفاده شده است',
+    //         'password.required' => 'رمز عبور را وارد نمایید',
+    //         'password.min' => 'رمز عبور باید حداقل ۸ حرف باشد',
+    //     ];
+    // }
 }
