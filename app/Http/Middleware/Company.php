@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class Admin
+class Company
 {
     /**
      * Handle an incoming request.
@@ -16,10 +16,10 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->role === "Admin") {
+        if (Auth::user()->role === "Company") {
             return $next($request);
         } else {
-            return response()->json(['Status' => 403, 'Message' => 'You Dont Have Accsess. Enter With Admin User']);
+            return response()->json(['Status' => 403, 'Message' => 'You Dont Have Accsess. Enter With Company User']);
         }
     }
 }
