@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('Status');
             $table->string('Subticket')->nullable();
             $table->integer('SenderID');
+            $table->string('SenderName');
             $table->integer('ReciverID');
+            $table->string('ReciverName');
             $table->text('Desc');
             $table->text('Files')->nullable();
             $table->timestamps();

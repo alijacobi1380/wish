@@ -23,16 +23,20 @@ class CompanyController extends Controller
         if ($request->hasfile('ticketfiles')) {
             foreach ($request->file('ticketfiles') as $key => $file) {
                 $name = $file->getClientOriginalName();
-                $file->move(public_path() . '/files/tickets', $name);
-                $data[$key] = $name;
+                $file->move(public_path() . '/files/tickets', time() . '_' . $name);
+                $data[$key] = asset('files/tickets') . '/' . time() . '_' . $name;
             }
         }
+
+        $reciveruser = DB::table('users')->where('id', '=', $request->reciverid)->first();
 
         $ticket = DB::table('tickets')->insertGetId(
             [
                 'Title' => $request->title,
                 'Status' => 1,
+                'SenderName' => Auth::user()->name . ' ' . Auth::user()->lastname,
                 'SenderID' => Auth::user()->id,
+                'ReciverName' => $reciveruser->name . ' ' . $reciveruser->lastname,
                 'ReciverID' => $request->reciverid,
                 'Desc' => $request->desc,
                 'Files' => serialize($data),

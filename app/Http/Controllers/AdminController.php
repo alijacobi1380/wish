@@ -18,7 +18,10 @@ class AdminController extends Controller
 
     function gettickets()
     {
-        $tickets = DB::table('tickets')->where('ReciverID', '=', Auth::user()->id)->get();
+        $tickets = DB::table('tickets')->get();
+        $tickets->map(function ($item) {
+            $item->Files = unserialize($item->Files);
+        });
         return response()->json(['Tickets' => $tickets], 200);
     }
 }
