@@ -11,17 +11,17 @@ class AdminController extends Controller
 {
     function Getusers()
     {
-        $users = User::get();
-        return response()->json(['UsersData' => $users], 200);
+        $users = DB::table('users')->orderBy('id', 'DESC')->get();
+        return response()->json(['Status' => 200, 'UsersData' => $users], 200);
     }
 
 
     function gettickets()
     {
-        $tickets = DB::table('tickets')->get();
+        $tickets = DB::table('tickets')->where('ReciverID', '=', Auth::user()->id)->orWhere('SenderID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
         $tickets->map(function ($item) {
             $item->Files = unserialize($item->Files);
         });
-        return response()->json(['Tickets' => $tickets], 200);
+        return response()->json(['Status' => 200, 'Tickets' => $tickets], 200);
     }
 }

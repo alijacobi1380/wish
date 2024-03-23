@@ -46,5 +46,6 @@ Route::prefix('v1')->group(function () {
 
         Route::get('adminlist', [CompanyController::class, 'getadminlist'])->name('getadmins');
         Route::post('sendticket', [CompanyController::class, 'sendticket'])->name('sendticket');
+        Route::get('ticketlists', [CompanyController::class, 'ticketlists'])->name('ticketlists');
     });
 });
