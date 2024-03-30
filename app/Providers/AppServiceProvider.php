@@ -19,6 +19,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        function onesr($ticket)
+        {
+            $ticket->Files = unserialize($ticket->Files);
+        }
+
+        function manysr($tickets)
+        {
+            $tickets->map(function ($item) {
+                $item->Files = unserialize($item->Files);
+            });
+        }
     }
 }

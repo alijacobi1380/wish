@@ -19,4 +19,9 @@ class tickets extends Model
     protected $casts = [
         'Files' => 'array'
     ];
+
+    function replays()
+    {
+        return $this->hasMany(Replays::class,'TicketID');
+    }
 }

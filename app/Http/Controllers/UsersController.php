@@ -56,6 +56,11 @@ class UsersController extends Controller
         }
     }
 
+    function categorielist()
+    {
+        $categorys = DB::table('categories')->get();
+        return response()->json(['Status' => 200, 'categories' => $categorys], 200);
+    }
 
     public function logout(Request $request)
     {
