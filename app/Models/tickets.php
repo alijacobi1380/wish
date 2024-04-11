@@ -16,9 +16,6 @@ class tickets extends Model
      */
     protected $table = 'tickets';
 
-    protected $casts = [
-        'Files' => 'array'
-    ];
 
     function replays()
     {

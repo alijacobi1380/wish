@@ -29,7 +29,9 @@ class AdminController extends Controller
         $categorie = DB::table('categories')->insertGetId([
             'Title' => $request->title,
             'Icon' => $request->icon,
-            'SubCat' => $request->subcat
+            'SubCat' => $request->subcat,
+            'Type' => $request->type,
+            'Desc' => $request->desc,
         ]);
 
 

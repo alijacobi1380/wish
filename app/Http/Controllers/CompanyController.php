@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ReplayTicket;
+use App\Http\Requests\SendProduct;
 use App\Http\Requests\SendTicket;
 use App\Models\tickets;
 use App\Models\User;
 use Dotenv\Validator;
+use Faker\Core\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 use function App\Providers\manysr;
 use function App\Providers\onesr;
@@ -19,6 +23,71 @@ class CompanyController extends Controller
     function getadminlist()
     {
         return response()->json(['admins' => User::where('Role', '=', 'Admin')->get()]);
+    }
+
+    function productlist()
+    {
+        $products = DB::table('products')->where('UserID', '=', Auth::user()->id)->get();
+        $products->map(function ($item) {
+            $item->Pics = unserialize($item->Pics);
+        });
+        return response()->json(['status' => 200, 'Products' => $products]);
+    }
+
+    function deleteproduct($id)
+    {
+        $product = DB::table('products')->where('id', '=', $id)->first();
+        if ($product && $product->UserID == Auth::user()->id) {
+            if ($product->Pics && is_array(unserialize($product->Pics))) {
+                foreach (unserialize($product->Pics) as $pc) {
+                    $d = str_replace(URL::to('/') . '/', "", $pc);
+                    unlink($d);
+                }
+            } else {
+                unlink(str_replace(URL::to('/') . '/', "", unserialize($product->Pics)));
+            }
+            DB::table('products')->where('id', '=', $id)->delete();
+            return response()->json(['status' => 200, 'messages' => 'Product Deleted', 'ProductID' => $id]);
+        } else {
+            return response()->json(['status' => 404, 'messages' => 'Product Not Exists', 'ProductID' => $id]);
+        }
+    }
+
+    function addproduct(SendProduct $request)
+    {
+
+        $data = [];
+        if ($request->hasfile('pics') && is_array($request->pics)) {
+            foreach ($request->file('pics') as $key => $file) {
+                $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $file->move(public_path() . '/files/products/', $name);
+                $data[$key] = asset('files/products/') . '/' . $name;
+            }
+        } elseif ($request->hasfile('pics')) {
+            $file = $request->file('pics');
+            $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move(public_path() . '/files/products/', $name);
+            $data = asset('files/products') . '/' . $name;
+        }
+
+
+        $product = DB::table('products')->insertGetId(
+            [
+                'Title' => $request->title,
+                'UserID' => Auth::user()->id,
+                'Price' => $request->price,
+                'Category' => $request->category,
+                'Desc' => $request->desc,
+                'Pics' => serialize($data),
+                'Rate' => $request->rate
+            ]
+        );
+
+        if ($product) {
+            return response()->json(['status' => 200, 'messages' => 'Product Added', 'ProductID' => $product]);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Product Added Faild']);
+        }
     }
 
 

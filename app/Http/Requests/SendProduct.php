@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SendCategory extends FormRequest
+class SendProduct extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,11 @@ class SendCategory extends FormRequest
     {
         return [
             'title' => 'required',
-            'icon' => 'required',
+            'category' => 'required',
+            'pics' => 'required',
             'desc' => 'required',
-            'type' => 'required',
+            'price' => 'required',
+            'rate' => 'required',
         ];
     }
 }

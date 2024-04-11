@@ -61,5 +61,10 @@ Route::prefix('v1')->group(function () {
         Route::get('ticketlists', [CompanyController::class, 'ticketlists'])->name('ticketlists');
         Route::post('sendreplay', [CompanyController::class, 'sendreplay'])->name('sendreplay');
         Route::get('replaylists/{id}', [CompanyController::class, 'replaylists'])->name('replaylists');
+
+        // Products
+        Route::post('addproduct', [CompanyController::class, 'addproduct'])->name('addproduct');
+        Route::get('deleteproduct/{id}', [CompanyController::class, 'deleteproduct'])->name('deleteproduct');
+        Route::get('productlist', [CompanyController::class, 'productlist'])->name('productlist');
     });
 });
