@@ -56,6 +56,24 @@ class UsersController extends Controller
         }
     }
 
+    function productlist()
+    {
+        $products = DB::table('products')->get();
+        $products->map(function ($item) {
+            $item->Pics = unserialize($item->Pics);
+        });
+        return response()->json(['Status' => 200, 'products' => $products], 200);
+    }
+
+    function servicelist()
+    {
+        $services = DB::table('services')->get();
+        $services->map(function ($item) {
+            $item->Pics = unserialize($item->Pics);
+        });
+        return response()->json(['Status' => 200, 'Services' => $services], 200);
+    }
+
     function categorielist()
     {
         $categorys = DB::table('categories')->get();

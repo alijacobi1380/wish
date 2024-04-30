@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReplayTicket;
 use App\Http\Requests\SendProduct;
+use App\Http\Requests\SendService;
 use App\Http\Requests\SendTicket;
 use App\Models\tickets;
 use App\Models\User;
@@ -78,8 +79,9 @@ class CompanyController extends Controller
                 'Price' => $request->price,
                 'Category' => $request->category,
                 'Desc' => $request->desc,
+                'EANCode' => $request->eancode,
                 'Pics' => serialize($data),
-                'Rate' => $request->rate
+                'Status' => $request->status
             ]
         );
 
@@ -87,6 +89,152 @@ class CompanyController extends Controller
             return response()->json(['status' => 200, 'messages' => 'Product Added', 'ProductID' => $product]);
         } else {
             return response()->json(['status' => 203, 'message' => 'Product Added Faild']);
+        }
+    }
+
+    function updateproduct($id, Request $request)
+    {
+
+        $data = [];
+        if ($request->hasfile('pics') && is_array($request->pics)) {
+            foreach ($request->file('pics') as $key => $file) {
+                $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $file->move(public_path() . '/files/products/', $name);
+                $data[$key] = asset('files/products/') . '/' . $name;
+            }
+        } elseif ($request->hasfile('pics')) {
+            $file = $request->file('pics');
+            $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move(public_path() . '/files/products/', $name);
+            $data = asset('files/products') . '/' . $name;
+        }
+
+        $p = DB::table('products')->where('id', '=', $id)->first();
+        if ($p->UserID == Auth::user()->id) {
+            $product = DB::table('products')->where('id', '=', $id)->update(
+                [
+                    'Title' => $request->title,
+                    'Price' => $request->price,
+                    'Category' => $request->category,
+                    'Desc' => $request->desc,
+                    'Pics' => serialize($data),
+                    'Status' => $request->status,
+                    'Rate' => $request->rate,
+                    'RateCount' => $request->ratecount,
+                ]
+            );
+        }
+
+        if ($product) {
+            return response()->json(['status' => 200, 'messages' => 'Product Updated', 'ProductID' => $product]);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Product Updated Faild']);
+        }
+    }
+
+
+    function servicelist()
+    {
+        $services = DB::table('services')->where('UserID', '=', Auth::user()->id)->get();
+        $services->map(function ($item) {
+            $item->Pics = unserialize($item->Pics);
+        });
+        return response()->json(['status' => 200, 'services' => $services]);
+    }
+
+    function deleteservice($id)
+    {
+        $service = DB::table('services')->where('id', '=', $id)->first();
+        if ($service && $service->UserID == Auth::user()->id) {
+            if ($service->Pics && is_array(unserialize($service->Pics))) {
+                foreach (unserialize($service->Pics) as $pc) {
+                    $d = str_replace(URL::to('/') . '/', "", $pc);
+                    unlink($d);
+                }
+            } else {
+                unlink(str_replace(URL::to('/') . '/', "", unserialize($service->Pics)));
+            }
+            DB::table('services')->where('id', '=', $id)->delete();
+            return response()->json(['status' => 200, 'messages' => 'Service Deleted', 'ServiceID' => $id]);
+        } else {
+            return response()->json(['status' => 404, 'messages' => 'Service Not Exists', 'ServiceID' => $id]);
+        }
+    }
+
+    function addservice(SendService $request)
+    {
+
+        $data = [];
+        if ($request->hasfile('pics') && is_array($request->pics)) {
+            foreach ($request->file('pics') as $key => $file) {
+                $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $file->move(public_path() . '/files/services/', $name);
+                $data[$key] = asset('files/services/') . '/' . $name;
+            }
+        } elseif ($request->hasfile('pics')) {
+            $file = $request->file('pics');
+            $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move(public_path() . '/files/services/', $name);
+            $data = asset('files/services') . '/' . $name;
+        }
+
+
+        $service = DB::table('services')->insertGetId(
+            [
+                'Title' => $request->title,
+                'UserID' => Auth::user()->id,
+                'Price' => $request->price,
+                'Category' => $request->category,
+                'Desc' => $request->desc,
+                'Pics' => serialize($data),
+                'Status' => $request->status
+            ]
+        );
+
+        if ($service) {
+            return response()->json(['status' => 200, 'messages' => 'Service Added', 'ServiceID' => $service]);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Service Added Faild']);
+        }
+    }
+
+    function updateservice($id, Request $request)
+    {
+
+        $data = [];
+        if ($request->hasfile('pics') && is_array($request->pics)) {
+            foreach ($request->file('pics') as $key => $file) {
+                $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $file->move(public_path() . '/files/services/', $name);
+                $data[$key] = asset('files/services/') . '/' . $name;
+            }
+        } elseif ($request->hasfile('pics')) {
+            $file = $request->file('pics');
+            $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move(public_path() . '/files/services/', $name);
+            $data = asset('files/services') . '/' . $name;
+        }
+
+        $p = DB::table('services')->where('id', '=', $id)->first();
+        if ($p->UserID == Auth::user()->id) {
+            $service = DB::table('services')->where('id', '=', $id)->update(
+                [
+                    'Title' => $request->title,
+                    'Price' => $request->price,
+                    'Category' => $request->category,
+                    'Desc' => $request->desc,
+                    'Pics' => serialize($data),
+                    'Status' => $request->status,
+                    'Rate' => $request->rate,
+                    'RateCount' => $request->ratecount,
+                ]
+            );
+        }
+
+        if ($service) {
+            return response()->json(['status' => 200, 'messages' => 'Service Updated', 'ServiceID' => $service]);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Service Updated Faild']);
         }
     }
 

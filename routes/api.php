@@ -32,6 +32,8 @@ Route::prefix('v1')->group(function () {
 
     // Global Routes
     Route::get('categorielist', [UsersController::class, 'categorielist'])->name('categorielist');
+    Route::get('productlist', [UsersController::class, 'productlist'])->name('productlist');
+    Route::get('servicelist', [UsersController::class, 'servicelist'])->name('servicelist');
 
 
     // Admin Routes
@@ -64,7 +66,15 @@ Route::prefix('v1')->group(function () {
 
         // Products
         Route::post('addproduct', [CompanyController::class, 'addproduct'])->name('addproduct');
+        Route::post('updateproduct/{id}', [CompanyController::class, 'updateproduct'])->name('updateproduct');
         Route::get('deleteproduct/{id}', [CompanyController::class, 'deleteproduct'])->name('deleteproduct');
         Route::get('productlist', [CompanyController::class, 'productlist'])->name('productlist');
+
+
+        // Services
+        Route::post('addservice', [CompanyController::class, 'addservice'])->name('addservice');
+        Route::post('updateservice/{id}', [CompanyController::class, 'updateservice'])->name('updateservice');
+        Route::get('deleteservice/{id}', [CompanyController::class, 'deleteservice'])->name('deleteservice');
+        Route::get('servicelist', [CompanyController::class, 'servicelist'])->name('servicelist');
     });
 });

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SendProduct extends FormRequest
+class SendService extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,6 @@ class SendProduct extends FormRequest
             'desc' => 'required',
             'price' => 'required',
             'status' => 'required',
-            'eancode' => 'required|digits:13|numeric',
         ];
     }
 }
