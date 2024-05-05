@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Client;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UsersController;
 use App\Models\User;
@@ -37,44 +39,61 @@ Route::prefix('v1')->group(function () {
 
 
     // Admin Routes
-    Route::name('admin.')->prefix('admin')->middleware(['Admin', 'auth:sanctum'])->group(function () {
+    Route::name('admin.')->prefix('admin')->controller(AdminController::class)->middleware(['Admin', 'auth:sanctum'])->group(function () {
 
 
-        Route::get('userslist', [AdminController::class, 'Getusers'])->name('getusers');
+        Route::get('userslist', 'Getusers')->name('getusers');
 
         // Tickets
-        Route::get('ticketlist', [AdminController::class, 'gettickets'])->name('gettickets');
-        Route::get('replaylists/{id}', [AdminController::class, 'replaylists'])->name('replaylists');
-        Route::post('sendreplay/{id}', [AdminController::class, 'sendreplay'])->name('sendreplay');
+        Route::get('ticketlist', 'gettickets')->name('gettickets');
+        Route::get('replaylists/{id}', 'replaylists')->name('replaylists');
+        Route::post('sendreplay/{id}', 'sendreplay')->name('sendreplay');
 
         // Category
-        Route::post('sendcategorie', [AdminController::class, 'sendcategorie'])->name('sendcategorie');
-        Route::get('deletecategorie/{id}', [AdminController::class, 'deletecategorie'])->name('deletecategorie');
-        Route::post('updatecategorie/{id}', [AdminController::class, 'updatecategorie'])->name('updatecategorie');
+        Route::post('sendcategorie', 'sendcategorie')->name('sendcategorie');
+        Route::get('deletecategorie/{id}', 'deletecategorie')->name('deletecategorie');
+        Route::post('updatecategorie/{id}', 'updatecategorie')->name('updatecategorie');
     });
 
 
     // Company Routes
-    Route::name('company.')->prefix('company')->middleware(['Company', 'auth:sanctum'])->group(function () {
+    Route::name('company.')->prefix('company')->controller(CompanyController::class)->middleware(['Company', 'auth:sanctum'])->group(function () {
 
-
-        Route::get('adminlist', [CompanyController::class, 'getadminlist'])->name('getadmins');
-        Route::post('sendticket', [CompanyController::class, 'sendticket'])->name('sendticket');
-        Route::get('ticketlists', [CompanyController::class, 'ticketlists'])->name('ticketlists');
-        Route::post('sendreplay', [CompanyController::class, 'sendreplay'])->name('sendreplay');
-        Route::get('replaylists/{id}', [CompanyController::class, 'replaylists'])->name('replaylists');
+        // Tickets
+        Route::get('adminlist', 'getadminlist')->name('getadmins');
+        Route::post('sendticket', 'sendticket')->name('sendticket');
+        Route::get('ticketlists', 'ticketlists')->name('ticketlists');
+        Route::post('sendreplay', 'sendreplay')->name('sendreplay');
+        Route::get('replaylists/{id}', 'replaylists')->name('replaylists');
 
         // Products
-        Route::post('addproduct', [CompanyController::class, 'addproduct'])->name('addproduct');
-        Route::post('updateproduct/{id}', [CompanyController::class, 'updateproduct'])->name('updateproduct');
-        Route::get('deleteproduct/{id}', [CompanyController::class, 'deleteproduct'])->name('deleteproduct');
-        Route::get('productlist', [CompanyController::class, 'productlist'])->name('productlist');
+        Route::post('addproduct', 'addproduct')->name('addproduct');
+        Route::post('updateproduct/{id}', 'updateproduct')->name('updateproduct');
+        Route::get('deleteproduct/{id}', 'deleteproduct')->name('deleteproduct');
+        Route::get('productlist', 'productlist')->name('productlist');
 
 
         // Services
-        Route::post('addservice', [CompanyController::class, 'addservice'])->name('addservice');
-        Route::post('updateservice/{id}', [CompanyController::class, 'updateservice'])->name('updateservice');
-        Route::get('deleteservice/{id}', [CompanyController::class, 'deleteservice'])->name('deleteservice');
-        Route::get('servicelist', [CompanyController::class, 'servicelist'])->name('servicelist');
+        Route::post('addservice', 'addservice')->name('addservice');
+        Route::post('updateservice/{id}', 'updateservice')->name('updateservice');
+        Route::get('deleteservice/{id}', 'deleteservice')->name('deleteservice');
+        Route::get('servicelist', 'servicelist')->name('servicelist');
+    });
+
+
+    // Client Routes
+    Route::name('client.')->prefix('client')->controller(ClientController::class)->middleware(['Client', 'auth:sanctum'])->group(function () {
+
+        // Tickets
+        Route::get('adminlist', 'getadminlist')->name('getadmins');
+        Route::post('sendticket', 'sendticket')->name('sendticket');
+        Route::get('ticketlists', 'ticketlists')->name('ticketlists');
+        Route::post('sendreplay', 'sendreplay')->name('sendreplay');
+        Route::get('replaylists/{id}', 'replaylists')->name('replaylists');
+
+        // Wish
+        Route::post('sendwish', 'sendwish')->name('sendwish');
+        Route::get('wishlist', 'wishlist')->name('wishlist');
+        Route::get('deletewish/{id}', 'deletewish')->name('wishlist');
     });
 });
