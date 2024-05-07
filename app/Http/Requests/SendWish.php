@@ -24,7 +24,9 @@ class SendWish extends FormRequest
         return [
             'title' => 'required',
             'category' => 'required',
+            'minidesc' => 'required',
             'desc' => 'required',
+            'importance' => 'required',
             'wishfiles.*' => 'mimes:jpeg,jpg,png,pdf'
         ];
     }

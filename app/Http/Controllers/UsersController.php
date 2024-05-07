@@ -80,6 +80,12 @@ class UsersController extends Controller
         return response()->json(['Status' => 200, 'categories' => $categorys], 200);
     }
 
+    function wishlist()
+    {
+        $wishs = DB::table('wishs')->get();
+        return response()->json(['Status' => 200, 'Wishs' => $wishs], 200);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

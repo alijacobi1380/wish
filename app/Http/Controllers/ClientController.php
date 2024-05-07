@@ -155,7 +155,9 @@ class ClientController extends Controller
                 'UserID' => Auth::user()->id,
                 'Desc' => $request->desc,
                 'Files' => serialize($data),
-                'Category' => $request->category
+                'Category' => $request->category,
+                'Importance' => $request->importance,
+                'MiniDesc' => $request->minidesc,
             ]
         );
 

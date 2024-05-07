@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('UserID');
             $table->string('Title');
             $table->text('Desc');
+            $table->text('MiniDesc');
             $table->integer('Category');
             $table->text('Files')->nullable();
             $table->integer('Importance')->default(1);

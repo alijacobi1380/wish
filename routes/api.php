@@ -36,6 +36,7 @@ Route::prefix('v1')->group(function () {
     Route::get('categorielist', [UsersController::class, 'categorielist'])->name('categorielist');
     Route::get('productlist', [UsersController::class, 'productlist'])->name('productlist');
     Route::get('servicelist', [UsersController::class, 'servicelist'])->name('servicelist');
+    Route::get('wishlist', [UsersController::class, 'wishlist'])->name('wishlist');
 
 
     // Admin Routes
