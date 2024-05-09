@@ -170,9 +170,7 @@ class ClientController extends Controller
 
     function wishlist()
     {
-        $wishs = DB::table('wishs')->where(function ($query) {
-            $query->where('UserID', '=', Auth::user()->id);
-        })->orderBy('id', 'DESC')->get();
+        $wishs = DB::table('wishs')->orderBy('id', 'DESC')->get();
         manysr($wishs);
 
 

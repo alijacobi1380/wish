@@ -6,7 +6,9 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UsersController;
 use App\Models\User;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +28,18 @@ Route::prefix('v1')->group(function () {
         return $request->user();
     });
 
+    // Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    //     $request->fulfill();
+
+    //     return redirect('/home');
+    // })->middleware(['auth', 'signed'])->name('verification.verify');
+
+
+    Route::get('/email/verify', function () {
+        $user = User::where('id', Auth::user()->id)->first();
+        $user->sendEmailVerificationNotification();
+        return response()->json(['Status' => 200, 'Message' => 'Verify Email Was Send']);
+    })->middleware('auth:sanctum');
 
     // Auth Routes
     Route::delete('/logout', [UsersController::class, 'logout'])->middleware('auth:sanctum');
@@ -40,7 +54,7 @@ Route::prefix('v1')->group(function () {
 
 
     // Admin Routes
-    Route::name('admin.')->prefix('admin')->controller(AdminController::class)->middleware(['Admin', 'auth:sanctum'])->group(function () {
+    Route::name('admin.')->prefix('admin')->controller(AdminController::class)->middleware(['Admin', 'auth:sanctum', 'verified'])->group(function () {
 
 
         Route::get('userslist', 'Getusers')->name('getusers');
@@ -58,7 +72,7 @@ Route::prefix('v1')->group(function () {
 
 
     // Company Routes
-    Route::name('company.')->prefix('company')->controller(CompanyController::class)->middleware(['Company', 'auth:sanctum'])->group(function () {
+    Route::name('company.')->prefix('company')->controller(CompanyController::class)->middleware(['Company', 'auth:sanctum', 'verified'])->group(function () {
 
         // Tickets
         Route::get('adminlist', 'getadminlist')->name('getadmins');
@@ -83,7 +97,7 @@ Route::prefix('v1')->group(function () {
 
 
     // Client Routes
-    Route::name('client.')->prefix('client')->controller(ClientController::class)->middleware(['Client', 'auth:sanctum'])->group(function () {
+    Route::name('client.')->prefix('client')->controller(ClientController::class)->middleware(['Client', 'auth:sanctum', 'verified'])->group(function () {
 
         // Tickets
         Route::get('adminlist', 'getadminlist')->name('getadmins');
