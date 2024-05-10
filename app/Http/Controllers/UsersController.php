@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Base\LoginRequest;
 use App\Http\Requests\Base\RegisterRequest;
+use App\Http\Requests\changepassword;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Logout;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\Sanctum;
 
 
@@ -27,6 +29,47 @@ class UsersController extends Controller
             return response()->json(['status' => 200, 'message' => 'Welcome', 'Token' => $token, 'user' => $user]);
         } else {
             return response()->json(['status' => 203, 'message' => 'This user not exists']);
+        }
+    }
+
+    function changepassword(changepassword $request)
+    {
+        $key = DB::table('resetpassword')->where('key', $request->code)->first();
+        if ($key) {
+            $u = DB::table('users')->where('email', '=', $key->email)->update(
+                [
+                    'password' => Hash::make($request->password),
+                ]
+            );
+            if ($u) {
+                return response()->json(['Status' => 200, 'Message' => 'Your Password Was Changed']);
+            }
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'Code Is Not Valid']);
+        }
+    }
+
+    function forgetpassword(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $key = md5(rand(1, 1000));
+            $to_name = $user->name;
+            $to_email = $user->email;
+            $m = Mail::send('email', ['user' => $user, 'key' => $key], function ($message) use ($to_name, $to_email) {
+                $message->to($to_email, $to_name)
+                    ->subject("WishTube");
+                $message->from("support@alijacobi.ir", "WishTube");
+            });
+            if ($m) {
+                DB::table('resetpassword')->insert([
+                    'email' => $request->email,
+                    'key' => $key,
+                ]);
+                return response()->json(['Status' => 200, 'Message' => 'Code Sended To Your Email']);
+            }
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'This Email Not Exists']);
         }
     }
 

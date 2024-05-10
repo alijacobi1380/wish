@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +42,9 @@ Route::prefix('v1')->group(function () {
         $user->sendEmailVerificationNotification();
         return response()->json(['Status' => 200, 'Message' => 'Verify Email Was Send']);
     })->middleware('auth:sanctum');
+
+    Route::post('/forgot-password', [UsersController::class, 'forgetpassword'])->name('forgetpassword');
+    Route::post('/changepassword', [UsersController::class, 'changepassword'])->name('changepassword');
 
     // Auth Routes
     Route::delete('/logout', [UsersController::class, 'logout'])->middleware('auth:sanctum');
