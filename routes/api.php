@@ -37,11 +37,8 @@ Route::prefix('v1')->group(function () {
     // })->middleware(['auth', 'signed'])->name('verification.verify');
 
 
-    Route::get('/email/verify', function () {
-        $user = User::where('id', Auth::user()->id)->first();
-        $user->sendEmailVerificationNotification();
-        return response()->json(['Status' => 200, 'Message' => 'Verify Email Was Send']);
-    })->middleware('auth:sanctum');
+    Route::get('/email/verify', [UsersController::class, 'verifyemail'])->middleware('auth:sanctum');
+    Route::get('/email/verify/{code}', [UsersController::class, 'accepctemail'])->name('accepctemail');
 
     Route::post('/forgot-password', [UsersController::class, 'forgetpassword'])->name('forgetpassword');
     Route::post('/changepassword', [UsersController::class, 'changepassword'])->name('changepassword');

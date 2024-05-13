@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\Sanctum;
 
+use Illuminate\Validation\ValidationException;
+
 
 class UsersController extends Controller
 {
@@ -32,6 +34,48 @@ class UsersController extends Controller
         }
     }
 
+    function accepctemail($code)
+    {
+        $key = DB::table('resetpassword')->where('key', $code)->first();
+        if ($key) {
+            $u = DB::table('users')->where('email', '=', $key->email)->update(
+                [
+                    'email_verified_at' => Carbon::now(),
+                ]
+            );
+            if ($u) {
+                DB::table('resetpassword')->where('key', '=', $code)->delete();
+                return 'Your Email Verified Successfully . Now Please Refresh Dashboard Page .';
+            }
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'Code Is Not Valid']);
+        }
+    }
+
+    function verifyemail()
+    {
+        $user = User::where('id', Auth::user()->id)->first();
+        if ($user) {
+            $key = md5(rand(1, 1000));
+            $to_name = $user->name;
+            $to_email = $user->email;
+            $m = Mail::send(['html' => 'verify'], ['user' => $user, 'key' => $key], function ($message) use ($to_name, $to_email) {
+                $message->to($to_email, $to_name)
+                    ->subject("WishTube");
+                $message->from("support@alijacobi.ir", "WishTube");
+            });
+            if ($m) {
+                DB::table('resetpassword')->insert([
+                    'email' => $user->email,
+                    'key' => $key,
+                ]);
+                return response()->json(['Status' => 200, 'Message' => 'Verify Link Sended To Your Email']);
+            }
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'This Email Not Exists']);
+        }
+    }
+
     function changepassword(changepassword $request)
     {
         $key = DB::table('resetpassword')->where('key', $request->code)->first();
@@ -45,7 +89,7 @@ class UsersController extends Controller
                 return response()->json(['Status' => 200, 'Message' => 'Your Password Was Changed']);
             }
         } else {
-            return response()->json(['Status' => 200, 'Message' => 'Code Is Not Valid']);
+            return response()->json(['Status' => 500, throw ValidationException::withMessages(['Code' => 'Code Is Not Valid'])]);
         }
     }
 
@@ -53,7 +97,7 @@ class UsersController extends Controller
     {
         $user = User::where('email', $request->email)->first();
         if ($user) {
-            $key = md5(rand(1, 1000));
+            $key = rand(10000000, 99999999);
             $to_name = $user->name;
             $to_email = $user->email;
             $m = Mail::send('email', ['user' => $user, 'key' => $key], function ($message) use ($to_name, $to_email) {
