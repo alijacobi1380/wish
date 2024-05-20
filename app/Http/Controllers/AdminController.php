@@ -139,6 +139,34 @@ class AdminController extends Controller
     function requestlist()
     {
         $requests = DB::table('requests')->orderBy('id', 'DESC')->get();
+        foreach ($requests as $key => $r) {
+            $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
+            $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+            switch ($r->Type) {
+                case 'wish':
+                    $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
+                    $rd->Pics = unserialize($rd->Pics);
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'product':
+                    $rd = DB::table('products')->where('id', '=', $r->RID)->first();
+                    $rd->Pics = unserialize($rd->Pics);
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'service':
+                    $rd = DB::table('services')->where('id', '=', $r->RID)->first();
+                    $rd->Pics = unserialize($rd->Pics);
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+            }
+        }
+        return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+    }
+    function getrequest($id)
+    {
+        $requests = DB::table('requests')->where('id', '=', $id)->first();
+        $senderuser = DB::table('users')->where('id', '=', $requests->SenderID)->first();
+        $receiveruser = DB::table('users')->where('id', '=', $requests->ReceiverID)->first();
         return response()->json(['Status' => 200, 'Requests' => $requests], 200);
     }
 }

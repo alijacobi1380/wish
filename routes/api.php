@@ -73,6 +73,7 @@ Route::prefix('v1')->group(function () {
 
         // Requests
         Route::get('requestlist', 'requestlist')->name('requestlist');
+        Route::get('getrequest/{id}', 'getrequest')->name('getrequest');
     });
 
 

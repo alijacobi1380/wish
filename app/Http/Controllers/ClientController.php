@@ -204,7 +204,7 @@ class ClientController extends Controller
             'type' => 'required',
         ]);
 
-        $requestcheck = DB::table('requests')->where('Type', '=', $request->type)->where('SenderID', '=', Auth::user()->id)->where('RequestID', '=', $request->requestid)->first();
+        $requestcheck = DB::table('requests')->where('Type', '=', $request->type)->where('SenderID', '=', Auth::user()->id)->where('RID', '=', $request->requestid)->first();
         if ($requestcheck) {
             return response()->json(['status' => 203, 'message' => 'You Have Already Submitted This Request']);
         } else {
@@ -218,11 +218,9 @@ class ClientController extends Controller
                 $user = DB::table('users')->where('id', '=', $data->UserID)->first();
                 $r = DB::table('requests')->insertGetId([
                     'Type' => $request->type,
-                    'RequestID' => $request->requestid,
+                    'RID' => $request->requestid,
                     'SenderID' => Auth::user()->id,
-                    'SenderName' => Auth::user()->name . '  ' . Auth::user()->name,
                     'ReceiverID' => $user->id,
-                    'ReceiverName' => $user->name . '  ' . $user->lastname,
                 ]);
                 return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
             } else {

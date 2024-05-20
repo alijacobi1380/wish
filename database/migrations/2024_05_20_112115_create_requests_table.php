@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
             $table->string('Type');
-            $table->integer('RequestID');
+            $table->string('RID');
+            $table->integer('Status')->default(1);
             $table->integer('SenderID');
-            $table->string('SenderName');
             $table->integer('ReceiverID');
-            $table->string('ReceiverName');
+            $table->text('VideoLink')->nullable();
             $table->timestamps();
         });
     }
