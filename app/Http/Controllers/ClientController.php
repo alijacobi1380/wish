@@ -155,7 +155,9 @@ class ClientController extends Controller
                 'UserID' => Auth::user()->id,
                 'Desc' => $request->desc,
                 'Files' => serialize($data),
-                'Category' => $request->category
+                'Category' => $request->category,
+                'Importance' => $request->importance,
+                'MiniDesc' => $request->minidesc,
             ]
         );
 
@@ -168,9 +170,7 @@ class ClientController extends Controller
 
     function wishlist()
     {
-        $wishs = DB::table('wishs')->where(function ($query) {
-            $query->where('UserID', '=', Auth::user()->id);
-        })->orderBy('id', 'DESC')->get();
+        $wishs = DB::table('wishs')->orderBy('id', 'DESC')->get();
         manysr($wishs);
 
 
@@ -194,6 +194,40 @@ class ClientController extends Controller
             return response()->json(['status' => 200, 'messages' => 'Wish Deleted', 'WishID' => $id]);
         } else {
             return response()->json(['status' => 404, 'messages' => 'Wish Not Exists', 'WishID' => $id]);
+        }
+    }
+
+    function addrequest(Request $request)
+    {
+        $request->validate([
+            'requestid' => 'required',
+            'type' => 'required',
+        ]);
+
+        $requestcheck = DB::table('requests')->where('Type', '=', $request->type)->where('SenderID', '=', Auth::user()->id)->where('RequestID', '=', $request->requestid)->first();
+        if ($requestcheck) {
+            return response()->json(['status' => 203, 'message' => 'You Have Already Submitted This Request']);
+        } else {
+            if ($request->type == 'service') {
+                $data = DB::table('services')->where('id', '=', $request->requestid)->first();
+            } elseif ($request->type == 'product') {
+                $data = DB::table('products')->where('id', '=', $request->requestid)->first();
+            }
+
+            if ($data) {
+                $user = DB::table('users')->where('id', '=', $data->UserID)->first();
+                $r = DB::table('requests')->insertGetId([
+                    'Type' => $request->type,
+                    'RequestID' => $request->requestid,
+                    'SenderID' => Auth::user()->id,
+                    'SenderName' => Auth::user()->name . '  ' . Auth::user()->name,
+                    'ReceiverID' => $user->id,
+                    'ReceiverName' => $user->name . '  ' . $user->lastname,
+                ]);
+                return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
+            } else {
+                return response()->json(['status' => 203, 'message' => 'This Service Or Product ID Is Not Existed']);
+            }
         }
     }
 }

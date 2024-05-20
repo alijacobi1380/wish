@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SendWish extends FormRequest
+class changepassword extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,8 @@ class SendWish extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
-            'category' => 'required',
-            'minidesc' => 'required',
-            'desc' => 'required',
-            'importance' => 'required',
-            'wishfiles.*' => 'mimes:jpeg,jpg,png,pdf'
+            'code' => 'required',
+            'password' => 'confirmed|required',
         ];
     }
 }

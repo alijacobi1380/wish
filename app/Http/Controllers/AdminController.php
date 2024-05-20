@@ -135,4 +135,10 @@ class AdminController extends Controller
         manysr($tickets);
         return response()->json(['Status' => 200, 'Tickets' => $tickets], 200);
     }
+
+    function requestlist()
+    {
+        $requests = DB::table('requests')->orderBy('id', 'DESC')->get();
+        return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+    }
 }

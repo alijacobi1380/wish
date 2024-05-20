@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('wishs', function (Blueprint $table) {
+        Schema::create('requests', function (Blueprint $table) {
             $table->id();
-            $table->integer('UserID');
-            $table->string('Title');
-            $table->text('Desc');
-            $table->text('MiniDesc');
-            $table->integer('Category');
-            $table->text('Files')->nullable();
-            $table->integer('Importance')->default(1);
+            $table->string('Type');
+            $table->integer('RequestID');
+            $table->integer('SenderID');
+            $table->string('SenderName');
+            $table->integer('ReceiverID');
+            $table->string('ReceiverName');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('wishs');
+        Schema::dropIfExists('requests');
     }
 };

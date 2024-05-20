@@ -344,4 +344,32 @@ class CompanyController extends Controller
             return response()->json(['status' => 203, 'message' => 'Ticket Create Faild']);
         }
     }
+
+    function addrequest(Request $request)
+    {
+        $request->validate([
+            'requestid' => 'required',
+        ]);
+
+        $requestcheck = DB::table('requests')->where('Type', '=', 'wish')->where('SenderID', '=', Auth::user()->id)->where('RequestID', '=', $request->requestid)->first();
+        if ($requestcheck) {
+            return response()->json(['status' => 203, 'message' => 'You Have Already Submitted This Request']);
+        } else {
+            $wish = DB::table('wishs')->where('id', '=', $request->requestid)->first();
+            if ($wish) {
+                $user = DB::table('users')->where('id', '=', $wish->UserID)->first();
+                $r = DB::table('requests')->insertGetId([
+                    'Type' => 'wish',
+                    'RequestID' => $request->requestid,
+                    'SenderID' => Auth::user()->id,
+                    'SenderName' => Auth::user()->name . '  ' . Auth::user()->name,
+                    'ReceiverID' => $user->id,
+                    'ReceiverName' => $user->name . '  ' . $user->lastname,
+                ]);
+                return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
+            } else {
+                return response()->json(['status' => 203, 'message' => 'This Wish ID Is Not Existed']);
+            }
+        }
+    }
 }
