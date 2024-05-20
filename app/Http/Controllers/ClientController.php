@@ -196,4 +196,38 @@ class ClientController extends Controller
             return response()->json(['status' => 404, 'messages' => 'Wish Not Exists', 'WishID' => $id]);
         }
     }
+
+    function addrequest(Request $request)
+    {
+        $request->validate([
+            'requestid' => 'required',
+            'type' => 'required',
+        ]);
+
+        $requestcheck = DB::table('requests')->where('Type', '=', $request->type)->where('SenderID', '=', Auth::user()->id)->where('RequestID', '=', $request->requestid)->first();
+        if ($requestcheck) {
+            return response()->json(['status' => 203, 'message' => 'You Have Already Submitted This Request']);
+        } else {
+            if ($request->type == 'service') {
+                $data = DB::table('services')->where('id', '=', $request->requestid)->first();
+            } elseif ($request->type == 'product') {
+                $data = DB::table('products')->where('id', '=', $request->requestid)->first();
+            }
+
+            if ($data) {
+                $user = DB::table('users')->where('id', '=', $data->UserID)->first();
+                $r = DB::table('requests')->insertGetId([
+                    'Type' => $request->type,
+                    'RequestID' => $request->requestid,
+                    'SenderID' => Auth::user()->id,
+                    'SenderName' => Auth::user()->name . '  ' . Auth::user()->name,
+                    'ReceiverID' => $user->id,
+                    'ReceiverName' => $user->name . '  ' . $user->lastname,
+                ]);
+                return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
+            } else {
+                return response()->json(['status' => 203, 'message' => 'This Service Or Product ID Is Not Existed']);
+            }
+        }
+    }
 }

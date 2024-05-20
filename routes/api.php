@@ -70,6 +70,9 @@ Route::prefix('v1')->group(function () {
         Route::post('sendcategorie', 'sendcategorie')->name('sendcategorie');
         Route::get('deletecategorie/{id}', 'deletecategorie')->name('deletecategorie');
         Route::post('updatecategorie/{id}', 'updatecategorie')->name('updatecategorie');
+
+        // Requests
+        Route::get('requestlist', 'requestlist')->name('requestlist');
     });
 
 
@@ -95,6 +98,9 @@ Route::prefix('v1')->group(function () {
         Route::post('updateservice/{id}', 'updateservice')->name('updateservice');
         Route::get('deleteservice/{id}', 'deleteservice')->name('deleteservice');
         Route::get('servicelist', 'servicelist')->name('servicelist');
+
+        // Requests
+        Route::post('addrequest', 'addrequest')->name('addrequest');
     });
 
 
@@ -112,5 +118,8 @@ Route::prefix('v1')->group(function () {
         Route::post('sendwish', 'sendwish')->name('sendwish');
         Route::get('wishlist', 'wishlist')->name('wishlist');
         Route::get('deletewish/{id}', 'deletewish')->name('wishlist');
+
+        // Requests
+        Route::post('addrequest', 'addrequest')->name('addrequest');
     });
 });

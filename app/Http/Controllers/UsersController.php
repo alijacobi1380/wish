@@ -48,7 +48,7 @@ class UsersController extends Controller
                 return 'Your Email Verified Successfully . Now Please Refresh Dashboard Page .';
             }
         } else {
-            return response()->json(['Status' => 200, 'Message' => 'Code Is Not Valid']);
+            return 'Code Is Not Valid';
         }
     }
 
