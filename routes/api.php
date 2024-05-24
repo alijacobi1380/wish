@@ -53,6 +53,10 @@ Route::prefix('v1')->group(function () {
     Route::get('productlist', [UsersController::class, 'productlist'])->name('productlist');
     Route::get('servicelist', [UsersController::class, 'servicelist'])->name('servicelist');
     Route::get('wishlist', [UsersController::class, 'wishlist'])->name('wishlist');
+    Route::get('getsinglewish/{id}', [UsersController::class, 'getsinglewish'])->name('getsinglewish');
+    Route::get('getsingleproduct/{id}', [UsersController::class, 'getsingleproduct'])->name('getsingleproduct');
+    Route::get('getsingleservice/{id}', [UsersController::class, 'getsingleservice'])->name('getsingleservice');
+
 
 
     // Admin Routes

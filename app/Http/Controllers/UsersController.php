@@ -17,6 +17,7 @@ use Laravel\Sanctum\Sanctum;
 
 use Illuminate\Validation\ValidationException;
 
+use function App\Providers\onesr;
 
 class UsersController extends Controller
 {
@@ -170,7 +171,43 @@ class UsersController extends Controller
     function wishlist()
     {
         $wishs = DB::table('wishs')->get();
+        $wishs->map(function ($item) {
+            $item->Files = unserialize($item->Files);
+        });
         return response()->json(['Status' => 200, 'Wishs' => $wishs], 200);
+    }
+
+    function getsinglewish($id)
+    {
+        $wish = DB::table('wishs')->where('id', '=', $id)->first();
+        if ($wish) {
+            onesr($wish);
+            return response()->json(['Status' => 200, 'Wish' => $wish], 200);
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'This Wish Not Excited'], 200);
+        }
+    }
+
+    function getsingleproduct($id)
+    {
+        $product = DB::table('products')->where('id', '=', $id)->first();
+        if ($product) {
+            $product->Pics = unserialize($product->Pics);
+            return response()->json(['Status' => 200, 'Product' => $product], 200);
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'This Product Not Excited'], 200);
+        }
+    }
+
+    function getsingleservice($id)
+    {
+        $service = DB::table('services')->where('id', '=', $id)->first();
+        if ($service) {
+            $service->Pics = unserialize($service->Pics);
+            return response()->json(['Status' => 200, 'Service' => $service], 200);
+        } else {
+            return response()->json(['Status' => 200, 'Message' => 'This Service Not Excited'], 200);
+        }
     }
 
     public function logout(Request $request)

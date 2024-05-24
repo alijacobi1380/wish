@@ -145,12 +145,12 @@ class AdminController extends Controller
             switch ($r->Type) {
                 case 'wish':
                     $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
-                    $rd->Pics = unserialize($rd->Pics);
+                    $rd->Files = unserialize($rd->Files);
                     $requests[$key]->RequestDetail = $rd;
                     break;
                 case 'product':
                     $rd = DB::table('products')->where('id', '=', $r->RID)->first();
-                    $rd->Pics = unserialize($rd->Pics);
+                    $rd->Files = unserialize($rd->Files);
                     $requests[$key]->RequestDetail = $rd;
                     break;
                 case 'service':

@@ -173,11 +173,9 @@ class ClientController extends Controller
         $wishs = DB::table('wishs')->orderBy('id', 'DESC')->get();
         manysr($wishs);
 
-
-
-
         return response()->json(['Status' => 200, 'Wishs' => $wishs], 200);
     }
+
     function deletewish($id)
     {
         $wish = DB::table('wishs')->where('id', '=', $id)->first();

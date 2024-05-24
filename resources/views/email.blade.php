@@ -36,14 +36,14 @@
                 <img src="{{$message->embed('emailimg/ForgetPassImg.jpg');}}" alt="ForgetPassImg">
                 <div id="child_txt">
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, dolorum modi. Quam eligendi illo ducimus sint molestias ipsum, est quos eveniet consectetur.</p>
-                    <h3>Dear User , Use Code Blow To Reset Your Password . </h3>
+                    <h3>Dear {{$user->name}} , Use Code Blow To Reset Your Password . </h3>
                     <div>
                         <h4>Confrimation Code Is : </h4> <h2 id="txt_blue">{{$key}}</h2>
                     </div>
                     <br><br><hr> 
                     <div id="child_bottom">
                         <h5>if you have any issues for reseting your Password or anything about your account conatct our suppurt team with email addres blow : <h5 class="txt_blue">
-                            <a href="#" target="_blank">support@wishtube.com</a>
+                            <a href="mailto:support@wishtube.com" target="_blank">support@wishtube.com</a>
                         </h5></h5>
                     </div>
                 </div>

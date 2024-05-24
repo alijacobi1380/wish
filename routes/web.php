@@ -19,4 +19,6 @@ Route::get('/', function () {
 });
 
 Auth::routes(['verify' => true, 'login' => false, 'register' => false]);
+
+
 // Route::get('logout', 'Auth\LoginController@logout');
