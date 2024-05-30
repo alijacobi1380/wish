@@ -19,7 +19,16 @@ return new class extends Migration
             $table->integer('companycode')->nullable();
             $table->string('role');
             $table->string('email')->unique();
+            $table->bigInteger('tradenumber')->nullable();
+            $table->string('activitytype')->nullable();
             $table->string('phone')->unique();
+            $table->string('website')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->text('fulladdress')->nullable();
+            $table->string('zipcode')->nullable();
+            $table->string('profilepicture')->nullable();
+            $table->string('landline_phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

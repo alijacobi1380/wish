@@ -30,6 +30,8 @@ Route::prefix('v1')->group(function () {
         return $request->user();
     });
 
+    Route::middleware('auth:sanctum')->post('/editprofile', [UsersController::class, 'editprofile'])->name('editprofile');
+
     // Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     //     $request->fulfill();
 
@@ -106,6 +108,7 @@ Route::prefix('v1')->group(function () {
 
         // Requests
         Route::post('addrequest', 'addrequest')->name('addrequest');
+        Route::get('requestlist', 'requestlist')->name('requestlist');
     });
 
 
@@ -126,5 +129,6 @@ Route::prefix('v1')->group(function () {
 
         // Requests
         Route::post('addrequest', 'addrequest')->name('addrequest');
+        Route::get('requestlist', 'requestlist')->name('requestlist');
     });
 });

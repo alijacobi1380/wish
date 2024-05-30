@@ -370,4 +370,18 @@ class CompanyController extends Controller
             }
         }
     }
+
+
+    function requestlist()
+    {
+        $requests = DB::table('requests')->where('SenderID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        foreach ($requests as $key => $r) {
+            $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
+            $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+            $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
+            $rd->Files = unserialize($rd->Files);
+            $requests[$key]->RequestDetail = $rd;
+        }
+        return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+    }
 }

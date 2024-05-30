@@ -170,7 +170,7 @@ class ClientController extends Controller
 
     function wishlist()
     {
-        $wishs = DB::table('wishs')->orderBy('id', 'DESC')->get();
+        $wishs = DB::table('wishs')->where('UserID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
         manysr($wishs);
 
         return response()->json(['Status' => 200, 'Wishs' => $wishs], 200);
@@ -225,5 +225,27 @@ class ClientController extends Controller
                 return response()->json(['status' => 203, 'message' => 'This Service Or Product ID Is Not Existed']);
             }
         }
+    }
+
+    function requestlist()
+    {
+        $requests = DB::table('requests')->where('SenderID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        foreach ($requests as $key => $r) {
+            $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
+            $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+            switch ($r->Type) {
+                case 'product':
+                    $rd = DB::table('products')->where('id', '=', $r->RID)->first();
+                    $rd->Files = unserialize($rd->Files);
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'service':
+                    $rd = DB::table('servi25ces')->where('id', '=', $r->RID)->first();
+                    $rd->Pics = unserialize($rd->Pics);
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+            }
+        }
+        return response()->json(['Status' => 200, 'Requests' => $requests], 200);
     }
 }

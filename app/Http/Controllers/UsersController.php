@@ -144,6 +144,52 @@ class UsersController extends Controller
         }
     }
 
+    function editprofile(Request $request)
+    {
+        $data = [];
+        if ($request->hasfile('profilepicture')) {
+            $file = $request->file('profilepicture');
+            $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move(public_path() . '/files/usersimg/', $name);
+            $data = asset('files/usersimg') . '/' . $name;
+        }
+
+        if (Auth::user()->role == 'Company') {
+            $user = DB::table('users')->where('id', '=', Auth::user()->id)->update(
+                [
+                    'tradenumber' => $request->tradenumber,
+                    'activitytype' => $request->activitytype,
+                    'website' => $request->website,
+                    'country' => $request->country,
+                    'city' => $request->city,
+                    'fulladdress' => $request->fulladdress,
+                    'zipcode' => $request->zipcode,
+                    'profilepicture' => $request->profilepicture,
+                    'landline_phone' => $request->landline_phone,
+                ]
+            );
+        } else {
+            $user = DB::table('users')->where('id', '=', Auth::user()->id)->update(
+                [
+                    'website' => $request->website,
+                    'country' => $request->country,
+                    'city' => $request->city,
+                    'fulladdress' => $request->fulladdress,
+                    'zipcode' => $request->zipcode,
+                    'profilepicture' => $request->profilepicture,
+                    'landline_phone' => $request->landline_phone,
+                ]
+            );
+        }
+
+
+        if ($user) {
+            return response()->json(['status' => 200, 'messages' => 'Profile Edited']);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Profile Edited Faild']);
+        }
+    }
+
     function productlist()
     {
         $products = DB::table('products')->get();
