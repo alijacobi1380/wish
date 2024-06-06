@@ -142,6 +142,7 @@ class AdminController extends Controller
         foreach ($requests as $key => $r) {
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+            $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
             switch ($r->Type) {
                 case 'wish':
                     $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
@@ -162,6 +163,41 @@ class AdminController extends Controller
         }
         return response()->json(['Status' => 200, 'Requests' => $requests], 200);
     }
+
+    function updaterequest(Request $request)
+    {
+        $this->validate($request, [
+            'RID' => 'required',
+            'date1' => 'required',
+            'date2' => 'required',
+            'date3' => 'required',
+        ]);
+
+        $rdate = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
+        if ($rdate == null) {
+            $up = DB::table('requestdates')->insert([
+                'RequestID' => $request->RID,
+                'date1' => $request->date1,
+                'date2' => $request->date2,
+                'date3' => $request->date3,
+            ]);
+
+
+            if ($up) {
+                DB::table('requests')->where('RID', '=', $request->RID)->update([
+                    'status' => 2,
+                ]);
+                return response()->json(['status' => 200, 'messages' => 'Update Requested']);
+            } else {
+                return response()->json(['status' => 203, 'message' => 'Update Requested Faild']);
+            }
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Request Already Has Date']);
+        }
+    }
+
+
+
     function getrequest($id)
     {
         $requests = DB::table('requests')->where('id', '=', $id)->first();

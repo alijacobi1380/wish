@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\Sanctum;
 
 use Illuminate\Validation\ValidationException;
+use PharIo\Manifest\Url;
 
 use function App\Providers\onesr;
 
@@ -146,40 +147,22 @@ class UsersController extends Controller
 
     function editprofile(Request $request)
     {
+        $requestData = $request->all();
         $data = [];
         if ($request->hasfile('profilepicture')) {
             $file = $request->file('profilepicture');
             $name = time() . rand(1, 100) . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $file->move(public_path() . '/files/usersimg/', $name);
             $data = asset('files/usersimg') . '/' . $name;
+            $requestData["profilepicture"] = $data;
         }
+        
+        // return $request->profilepicture;
 
         if (Auth::user()->role == 'Company') {
-            $user = DB::table('users')->where('id', '=', Auth::user()->id)->update(
-                [
-                    'tradenumber' => $request->tradenumber,
-                    'activitytype' => $request->activitytype,
-                    'website' => $request->website,
-                    'country' => $request->country,
-                    'city' => $request->city,
-                    'fulladdress' => $request->fulladdress,
-                    'zipcode' => $request->zipcode,
-                    'profilepicture' => $request->profilepicture,
-                    'landline_phone' => $request->landline_phone,
-                ]
-            );
+            $user = DB::table('users')->where('id', '=', Auth::user()->id)->update($requestData);
         } else {
-            $user = DB::table('users')->where('id', '=', Auth::user()->id)->update(
-                [
-                    'website' => $request->website,
-                    'country' => $request->country,
-                    'city' => $request->city,
-                    'fulladdress' => $request->fulladdress,
-                    'zipcode' => $request->zipcode,
-                    'profilepicture' => $request->profilepicture,
-                    'landline_phone' => $request->landline_phone,
-                ]
-            );
+            $user = DB::table('users')->where('id', '=', Auth::user()->id)->update($requestData);
         }
 
 

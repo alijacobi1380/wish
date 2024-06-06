@@ -80,6 +80,7 @@ Route::prefix('v1')->group(function () {
         // Requests
         Route::get('requestlist', 'requestlist')->name('requestlist');
         Route::get('getrequest/{id}', 'getrequest')->name('getrequest');
+        Route::post('updaterequest', 'updaterequest')->name('updaterequest');
     });
 
 
@@ -109,6 +110,7 @@ Route::prefix('v1')->group(function () {
         // Requests
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
+        Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
     });
 
 
@@ -130,5 +132,6 @@ Route::prefix('v1')->group(function () {
         // Requests
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
+        Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
     });
 });

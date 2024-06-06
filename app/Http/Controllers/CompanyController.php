@@ -378,10 +378,41 @@ class CompanyController extends Controller
         foreach ($requests as $key => $r) {
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+            $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
             $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
             $rd->Files = unserialize($rd->Files);
             $requests[$key]->RequestDetail = $rd;
         }
         return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+    }
+
+    function addrequestdate(Request $request)
+    {
+        $request->validate([
+            'RID' => 'required',
+            'selectDate' => 'required',
+        ]);
+
+
+        $r = DB::table('requestdates')->where('RequestID', '=', $request->RID)->update([
+            'CompanyDate' => $request->selectDate,
+        ]);
+
+
+        if ($r) {
+            $rs = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
+            if ($rs->ClientDate === $rs->CompanyDate) {
+                DB::table('requests')->where('RID', '=', $request->RID)->update([
+                    'Status' => 4
+                ]);
+            } else {
+                DB::table('requests')->where('RID', '=', $request->RID)->update([
+                    'Status' => 3
+                ]);
+            }
+            return response()->json(['status' => 200, 'messages' => 'Your Selected Dated Saved']);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Your Selected Dated Faild']);
+        }
     }
 }
