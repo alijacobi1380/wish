@@ -374,14 +374,39 @@ class CompanyController extends Controller
 
     function requestlist()
     {
-        $requests = DB::table('requests')->where('SenderID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        $requests = DB::table('requests')->where(function ($query) {
+            $query->where('SenderID', '=', Auth::user()->id)->orWhere('ReceiverID', '=', Auth::user()->id);
+        })->orderBy('id', 'DESC')->get();
         foreach ($requests as $key => $r) {
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
             $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
-            $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
-            $rd->Files = unserialize($rd->Files);
-            $requests[$key]->RequestDetail = $rd;
+            switch ($r->Type) {
+                case 'wish':
+                    $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Files = unserialize($rd->Files);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'product':
+                    $rd = DB::table('products')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'service':
+                    $rd = DB::table('services')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+            }
         }
         return response()->json(['Status' => 200, 'Requests' => $requests], 200);
     }
@@ -413,6 +438,55 @@ class CompanyController extends Controller
             return response()->json(['status' => 200, 'messages' => 'Your Selected Dated Saved']);
         } else {
             return response()->json(['status' => 203, 'message' => 'Your Selected Dated Faild']);
+        }
+    }
+
+    function addtrackpostCode(Request $request)
+    {
+        $request->validate([
+            'Code' => 'required',
+            'RID' => 'required'
+        ]);
+
+        $r = DB::table('requests')->where('id', '=', $request->RID)->where(function ($query) {
+            $query->where('SenderID', '=', Auth::user()->id)->orWhere('ReceiverID', '=', Auth::user()->id);
+        })->first();
+
+        if ($r) {
+            $check = DB::table('tracklists')->where('RID', '=', $request->RID)->where('SenderID', '=', Auth::user()->id)->first();
+            if ($check) {
+                return response()->json(['status' => 203, 'message' => 'You Have Recently Registered The Code']);
+            } else {
+                if ($r->Type == 'wish') {
+                    $w = DB::table('wishs')->where('id', '=', $r->RID)->first();
+                    $c = DB::table('categories')->where('id', '=', $w->Category)->first();
+                    if ($c->Type == 1) {
+                        return $this->addpost($request->Code, $request->RID);
+                    }else{
+                        return response()->json(['status' => 203, 'message' => 'This Request does not require a physical product']);
+                    }
+                } elseif ($r->Type == 'product') {
+                    return $this->addpost($request->Code, $request->RID);
+                } else {
+                    return response()->json(['status' => 203, 'message' => 'This Request does not require a physical product']);
+                }
+            }
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Request Not Exists']);
+        }
+    }
+    public function addpost($Code, $RID)
+    {
+        $q = DB::table('tracklists')->insertGetId([
+            'TrackCode' => $Code,
+            'RID' => $RID,
+            'SenderID' => Auth::user()->id,
+        ]);
+
+        if ($q) {
+            return response()->json(['status' => 200, 'messages' => 'Your Code Is Saved', 'TrackID' => $q]);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Track Code Faild']);
         }
     }
 }

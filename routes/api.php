@@ -81,6 +81,10 @@ Route::prefix('v1')->group(function () {
         Route::get('requestlist', 'requestlist')->name('requestlist');
         Route::get('getrequest/{id}', 'getrequest')->name('getrequest');
         Route::post('updaterequest', 'updaterequest')->name('updaterequest');
+        
+        // Post Track
+        Route::get('accepttrack/{id}', 'accepttrack')->name('accepttrack');
+        Route::get('tracklist', 'TrackList')->name('TrackList');
     });
 
 
@@ -111,6 +115,10 @@ Route::prefix('v1')->group(function () {
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
         Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
+        
+        // TrackPost
+        Route::post('addtrackpostcode', 'addtrackpostCode')->name('addtrackpostCode');
+
     });
 
 

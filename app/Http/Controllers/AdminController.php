@@ -139,6 +139,7 @@ class AdminController extends Controller
     function requestlist()
     {
         $requests = DB::table('requests')->orderBy('id', 'DESC')->get();
+
         foreach ($requests as $key => $r) {
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
@@ -146,21 +147,31 @@ class AdminController extends Controller
             switch ($r->Type) {
                 case 'wish':
                     $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
-                    $rd->Files = unserialize($rd->Files);
+                    if ($rd != null) {
+
+                        $rd->Files = unserialize($rd->Files);
+                    }
                     $requests[$key]->RequestDetail = $rd;
                     break;
                 case 'product':
                     $rd = DB::table('products')->where('id', '=', $r->RID)->first();
-                    $rd->Files = unserialize($rd->Files);
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
                     $requests[$key]->RequestDetail = $rd;
                     break;
                 case 'service':
                     $rd = DB::table('services')->where('id', '=', $r->RID)->first();
-                    $rd->Pics = unserialize($rd->Pics);
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
                     $requests[$key]->RequestDetail = $rd;
                     break;
             }
         }
+
         return response()->json(['Status' => 200, 'Requests' => $requests], 200);
     }
 
@@ -196,13 +207,42 @@ class AdminController extends Controller
         }
     }
 
-
-
     function getrequest($id)
     {
         $requests = DB::table('requests')->where('id', '=', $id)->first();
         $senderuser = DB::table('users')->where('id', '=', $requests->SenderID)->first();
         $receiveruser = DB::table('users')->where('id', '=', $requests->ReceiverID)->first();
         return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+    }
+
+    function accepttrack($id)
+    {
+        $q = DB::table('tracklists')->where('id', '=', $id)->update([
+            'AdminID' => Auth::user()->id,
+            'Status' => 1,
+        ]);
+
+        $q2 = DB::table('tracklists')->where('id', '=', $id)->first();
+
+        $r = DB::table('requests')->where('id', '=', $q2->RID)->update([
+            'Status' => 4,
+        ]);
+
+
+        if (isset($q) && isset($r)) {
+            return response()->json(['status' => 200, 'messages' => 'Track Is Accepted']);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Track Code Faild']);
+        }
+    }
+
+    function TrackList()
+    {
+        $tracklist = DB::table('tracklists')->get();
+        $tracklist->map(function ($item) {
+            $item->senderDetail = User::where('id', '=', $item->SenderID)->first();
+            $item->requestDetail = DB::table('requests')->where('id', '=', $item->RID)->first();
+        });
+        return $tracklist;
     }
 }

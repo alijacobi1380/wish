@@ -229,20 +229,36 @@ class ClientController extends Controller
 
     function requestlist()
     {
-        $requests = DB::table('requests')->where('SenderID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        $requests = DB::table('requests')->where(function ($query) {
+            $query->where('SenderID', '=', Auth::user()->id)->orWhere('ReceiverID', '=', Auth::user()->id);
+        })->orderBy('id', 'DESC')->get();
         foreach ($requests as $key => $r) {
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
             $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
             switch ($r->Type) {
+                case 'wish':
+                    $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Files = unserialize($rd->Files);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
                 case 'product':
                     $rd = DB::table('products')->where('id', '=', $r->RID)->first();
-                    $rd->Files = unserialize($rd->Files);
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
                     $requests[$key]->RequestDetail = $rd;
                     break;
                 case 'service':
-                    $rd = DB::table('servi25ces')->where('id', '=', $r->RID)->first();
-                    $rd->Pics = unserialize($rd->Pics);
+                    $rd = DB::table('services')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
                     $requests[$key]->RequestDetail = $rd;
                     break;
             }
@@ -273,7 +289,7 @@ class ClientController extends Controller
             }
             return response()->json(['status' => 200, 'messages' => 'Your Selected Dated Saved']);
         } else {
-            return response()->json(['status' => 203, 'message' => 'Your Selected Dated Saved']);
+            return response()->json(['status' => 203, 'message' => 'Your Selected Dated Faild']);
         }
     }
 }

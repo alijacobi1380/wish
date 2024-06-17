@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('requestdates', function (Blueprint $table) {
+        Schema::create('tracklists', function (Blueprint $table) {
             $table->id();
-            $table->integer('RequestID');
-            $table->string('Date1');
-            $table->string('Date2');
-            $table->string('Date3');
-            $table->text('CompanyDate')->nullable();
-            $table->text('ClientDate')->nullable();
+            $table->string('TrackCode');
+            $table->string('RID');
+            $table->integer('SenderID');
+            $table->integer('AdminID')->nullable();
+            $table->integer('Status')->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('requestdates');
+        Schema::dropIfExists('tracklists');
     }
 };
