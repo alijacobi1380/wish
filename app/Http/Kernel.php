@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'Admin' => \App\Http\Middleware\Admin::class,
         'Company' => \App\Http\Middleware\Company::class,
         'Client' => \App\Http\Middleware\Client::class,
+        'Filmmaker' => \App\Http\Middleware\Filmmaker::class,
     ];
 }

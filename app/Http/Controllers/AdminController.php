@@ -144,6 +144,7 @@ class AdminController extends Controller
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
             $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
+            $requests[$key]->Whowmakefilm = DB::table('whomakefilm')->where('RID', '=', $r->id)->first();
             switch ($r->Type) {
                 case 'wish':
                     $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
@@ -244,5 +245,119 @@ class AdminController extends Controller
             $item->requestDetail = DB::table('requests')->where('id', '=', $item->RID)->first();
         });
         return $tracklist;
+    }
+
+    function addrequestdate(Request $request)
+    {
+        $this->validate($request, [
+            'RID' => 'required',
+            'date1' => 'required',
+            'date2' => 'required',
+            'date3' => 'required',
+        ]);
+
+        $who = DB::table('whomakefilm')->where('RID', '=', $request->RID)->first();
+        if ($who) {
+            if ($who->UserID != Auth::user()->id) {
+                return response()->json(['status' => 200, 'messages' => 'You Cant Add Date']);
+            }
+
+
+            $rdate = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
+            if ($rdate == null) {
+                $up = DB::table('requestdates')->insert([
+                    'RequestID' => $request->RID,
+                    'date1' => $request->date1,
+                    'date2' => $request->date2,
+                    'date3' => $request->date3,
+                ]);
+
+
+                if ($up) {
+                    DB::table('requests')->where('RID', '=', $request->RID)->update([
+                        'status' => 2,
+                    ]);
+                    return response()->json(['status' => 200, 'messages' => 'Update Requested']);
+                } else {
+                    return response()->json(['status' => 203, 'message' => 'Update Requested Faild']);
+                }
+            } else {
+                return response()->json(['status' => 203, 'message' => 'Request Already Has Date']);
+            }
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Nobody Accpet The Film Yet']);
+        }
+    }
+
+    function acceptfilm(Request $request)
+    {
+        $request->validate([
+            'RID' => 'required',
+            'status' => 'required',
+        ]);
+
+        if ($request->status == 1) {
+            $request->validate([
+                'firstname' => 'required',
+                'lastname' => 'required',
+                'phone' => 'required',
+                'country' => 'required',
+                'city' => 'required',
+                'fulladdress' => 'required',
+                'zipcode' => 'required',
+            ]);
+        }
+
+        $r = DB::table('requests')->where('id', '=', $request->RID)->first();
+
+        if ($r) {
+
+            $w = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('AdminStatus', '=', 1)->first();
+
+            if (!isset($w)) {
+                $who = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('UserID', '=', Auth::user()->id)->first();
+                if (!$who) {
+                    $q = DB::table('whomakefilm')->insert([
+                        'RID' => $request->RID,
+                        'AdminStatus' => $request->status,
+                        'UserID' => Auth::user()->id,
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'phone' => $request->phone,
+                        'country' => $request->country,
+                        'city' => $request->city,
+                        'zipcode' => $request->zipcode,
+                        'fulladdress' => $request->fulladdress,
+                    ]);
+                } else {
+                    $q = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('AdminStatus', '=', 0)->where('UserID', '=', Auth::user()->id)->update([
+                        'AdminStatus' => $request->status,
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'phone' => $request->phone,
+                        'country' => $request->country,
+                        'city' => $request->city,
+                        'zipcode' => $request->zipcode,
+                        'fulladdress' => $request->fulladdress,
+                    ]);
+                }
+
+
+
+                if ($q) {
+                    if ($request->status == 1) {
+                        return response()->json(['status' => 200, 'messages' => 'You Accept To Make Film']);
+                    } else {
+                        return response()->json(['status' => 200, 'messages' => 'You Not Accept To Make Film']);
+                    }
+                } else {
+                    return response()->json(['status' => 203, 'message' => 'Accept Film Faild']);
+                }
+            } else {
+                return response()->json(['status' => 203, 'message' => 'This Request Allready Has A Film Maker']);
+            }
+        } else {
+            return response()->json(['status' => 203, 'message' => 'This Request Not Exists']);
+        }
     }
 }

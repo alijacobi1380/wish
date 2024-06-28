@@ -208,8 +208,10 @@ class ClientController extends Controller
         } else {
             if ($request->type == 'service') {
                 $data = DB::table('services')->where('id', '=', $request->requestid)->first();
+                $status = 4;
             } elseif ($request->type == 'product') {
                 $data = DB::table('products')->where('id', '=', $request->requestid)->first();
+                $status = 2;
             }
 
             if ($data) {
@@ -219,6 +221,7 @@ class ClientController extends Controller
                     'RID' => $request->requestid,
                     'SenderID' => Auth::user()->id,
                     'ReceiverID' => $user->id,
+                    'Status' => $status,
                 ]);
                 return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
             } else {
@@ -292,4 +295,5 @@ class ClientController extends Controller
             return response()->json(['status' => 203, 'message' => 'Your Selected Dated Faild']);
         }
     }
+
 }

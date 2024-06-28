@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Client;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\FilmmakerController;
 use App\Http\Controllers\UsersController;
 use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -81,10 +82,14 @@ Route::prefix('v1')->group(function () {
         Route::get('requestlist', 'requestlist')->name('requestlist');
         Route::get('getrequest/{id}', 'getrequest')->name('getrequest');
         Route::post('updaterequest', 'updaterequest')->name('updaterequest');
-        
+        Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
+
         // Post Track
         Route::get('accepttrack/{id}', 'accepttrack')->name('accepttrack');
         Route::get('tracklist', 'TrackList')->name('TrackList');
+
+        // Accept Film
+        Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
     });
 
 
@@ -115,10 +120,12 @@ Route::prefix('v1')->group(function () {
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
         Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
-        
+
         // TrackPost
         Route::post('addtrackpostcode', 'addtrackpostCode')->name('addtrackpostCode');
 
+        // Accept Film
+        Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
     });
 
 
@@ -140,6 +147,20 @@ Route::prefix('v1')->group(function () {
         // Requests
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
+        // Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
+
+        // Accept Film
+        Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
+    });
+
+    Route::name('filmmaker.')->prefix('filmmaker')->controller(FilmmakerController::class)->middleware(['Filmmaker', 'auth:sanctum', 'verified'])->group(function () {
+
+
+        // Requests
         Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
+
+        // Accept Film
+        Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
+        Route::get('requestlist', 'requestlist')->name('requestlist');
     });
 });

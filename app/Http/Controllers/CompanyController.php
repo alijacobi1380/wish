@@ -356,6 +356,12 @@ class CompanyController extends Controller
             return response()->json(['status' => 203, 'message' => 'You Have Already Submitted This Request']);
         } else {
             $wish = DB::table('wishs')->where('id', '=', $request->requestid)->first();
+            $cat = DB::table('categories')->where('id', '=', $wish->Category)->first();
+            if ($cat->Type == 1) {
+                $status = 2;
+            } else {
+                $status = 4;
+            }
             if ($wish) {
                 $user = DB::table('users')->where('id', '=', $wish->UserID)->first();
                 $r = DB::table('requests')->insertGetId([
@@ -363,6 +369,7 @@ class CompanyController extends Controller
                     'RID' => $request->requestid,
                     'SenderID' => Auth::user()->id,
                     'ReceiverID' => $user->id,
+                    'Status' => $status,
                 ]);
                 return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
             } else {
@@ -413,31 +420,42 @@ class CompanyController extends Controller
 
     function addrequestdate(Request $request)
     {
-        $request->validate([
+        $this->validate($request, [
             'RID' => 'required',
-            'selectDate' => 'required',
+            'date1' => 'required',
+            'date2' => 'required',
+            'date3' => 'required',
         ]);
 
-
-        $r = DB::table('requestdates')->where('RequestID', '=', $request->RID)->update([
-            'CompanyDate' => $request->selectDate,
-        ]);
-
-
-        if ($r) {
-            $rs = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
-            if ($rs->ClientDate === $rs->CompanyDate) {
-                DB::table('requests')->where('RID', '=', $request->RID)->update([
-                    'Status' => 4
-                ]);
-            } else {
-                DB::table('requests')->where('RID', '=', $request->RID)->update([
-                    'Status' => 3
-                ]);
+        $who = DB::table('whomakefilm')->where('RID', '=', $request->RID)->first();
+        if ($who) {
+            if ($who->UserID != Auth::user()->id) {
+                return response()->json(['status' => 200, 'messages' => 'You Cant Add Date']);
             }
-            return response()->json(['status' => 200, 'messages' => 'Your Selected Dated Saved']);
+
+            $rdate = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
+            if ($rdate == null) {
+                $up = DB::table('requestdates')->insert([
+                    'RequestID' => $request->RID,
+                    'date1' => $request->date1,
+                    'date2' => $request->date2,
+                    'date3' => $request->date3,
+                ]);
+
+
+                if ($up) {
+                    DB::table('requests')->where('RID', '=', $request->RID)->update([
+                        'status' => 2,
+                    ]);
+                    return response()->json(['status' => 200, 'messages' => 'Update Requested']);
+                } else {
+                    return response()->json(['status' => 203, 'message' => 'Update Requested Faild']);
+                }
+            } else {
+                return response()->json(['status' => 203, 'message' => 'Request Already Has Date']);
+            }
         } else {
-            return response()->json(['status' => 203, 'message' => 'Your Selected Dated Faild']);
+            return response()->json(['status' => 203, 'message' => 'Nobody Accpet The Film Yet']);
         }
     }
 
@@ -462,7 +480,7 @@ class CompanyController extends Controller
                     $c = DB::table('categories')->where('id', '=', $w->Category)->first();
                     if ($c->Type == 1) {
                         return $this->addpost($request->Code, $request->RID);
-                    }else{
+                    } else {
                         return response()->json(['status' => 203, 'message' => 'This Request does not require a physical product']);
                     }
                 } elseif ($r->Type == 'product') {
@@ -481,12 +499,75 @@ class CompanyController extends Controller
             'TrackCode' => $Code,
             'RID' => $RID,
             'SenderID' => Auth::user()->id,
+            'Status' => 3,
         ]);
 
         if ($q) {
             return response()->json(['status' => 200, 'messages' => 'Your Code Is Saved', 'TrackID' => $q]);
         } else {
             return response()->json(['status' => 203, 'message' => 'Track Code Faild']);
+        }
+    }
+
+    function acceptfilm(Request $request)
+    {
+        $request->validate([
+            'RID' => 'required',
+            'status' => 'required',
+        ]);
+
+
+
+        $r = DB::table('requests')->where('id', '=', $request->RID)->first();
+
+        if ($r) {
+
+            $w = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('CompanyStatus', '=', 1)->first();
+
+            if (!isset($w)) {
+                $who = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('UserID', '=', Auth::user()->id)->first();
+                if (!$who) {
+                    $q = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('AdminStatus', '=', 0)->update([
+                        'RID' => $request->RID,
+                        'CompanyStatus' => $request->status,
+                        'UserID' => Auth::user()->id,
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'phone' => $request->phone,
+                        'country' => $request->country,
+                        'city' => $request->city,
+                        'zipcode' => $request->zipcode,
+                        'fulladdress' => $request->fulladdress,
+                    ]);
+                } else {
+                    $q = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('CompanyStatus', '=', 0)->where('UserID', '=', Auth::user()->id)->update([
+                        'CompanyStatus' => $request->status,
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'phone' => $request->phone,
+                        'country' => $request->country,
+                        'city' => $request->city,
+                        'zipcode' => $request->zipcode,
+                        'fulladdress' => $request->fulladdress,
+                    ]);
+                }
+
+
+
+                if ($q) {
+                    if ($request->status == 1) {
+                        return response()->json(['status' => 200, 'messages' => 'You Accept To Make Film']);
+                    } else {
+                        return response()->json(['status' => 200, 'messages' => 'You Not Accept To Make Film']);
+                    }
+                } else {
+                    return response()->json(['status' => 203, 'message' => 'Accept Film Faild']);
+                }
+            } else {
+                return response()->json(['status' => 203, 'message' => 'This Request Allready Has A Film Maker']);
+            }
+        } else {
+            return response()->json(['status' => 203, 'message' => 'This Request Not Exists']);
         }
     }
 }
