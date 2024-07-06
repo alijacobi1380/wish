@@ -120,6 +120,7 @@ Route::prefix('v1')->group(function () {
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
         Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
+        Route::post('acceptdate', 'acceptdate')->name('acceptdate');
 
         // TrackPost
         Route::post('addtrackpostcode', 'addtrackpostCode')->name('addtrackpostCode');
@@ -147,6 +148,8 @@ Route::prefix('v1')->group(function () {
         // Requests
         Route::post('addrequest', 'addrequest')->name('addrequest');
         Route::get('requestlist', 'requestlist')->name('requestlist');
+        Route::post('acceptdate', 'acceptdate')->name('acceptdate');
+
         // Route::post('addrequestdate', 'addrequestdate')->name('addrequestdate');
 
         // Accept Film

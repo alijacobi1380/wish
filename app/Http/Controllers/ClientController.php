@@ -239,6 +239,8 @@ class ClientController extends Controller
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
             $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
+            $requests[$key]->Whowmakefilm = DB::table('whomakefilm')->where('RID', '=', $r->id)->first();
+
             switch ($r->Type) {
                 case 'wish':
                     $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
@@ -296,4 +298,21 @@ class ClientController extends Controller
         }
     }
 
+    function acceptdate(Request $request)
+    {
+        $request->validate([
+            'RID' => 'required',
+            'SelectDate' => 'required'
+        ]);
+
+
+        $rp = DB::table('requestdates')->where('RequestID', '=', $request->RID)->update([
+            'ClientDate' => $request->SelectDate,
+        ]);
+        if ($rp) {
+            return response()->json(['status' => 200, 'message' => 'Your Selected Date Saved']);
+        } else {
+            return response()->json(['status' => 200, 'message' => 'Saved Date Faild']);
+        }
+    }
 }

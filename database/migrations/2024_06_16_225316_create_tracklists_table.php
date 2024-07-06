@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('RID');
             $table->integer('SenderID');
             $table->integer('AdminID')->nullable();
+            $table->string('PostCompanyName');
             $table->integer('Status')->default(0);
             $table->timestamps();
         });

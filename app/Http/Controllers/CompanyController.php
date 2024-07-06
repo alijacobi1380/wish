@@ -388,6 +388,8 @@ class CompanyController extends Controller
             $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
             $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
             $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
+            $requests[$key]->Whowmakefilm = DB::table('whomakefilm')->where('RID', '=', $r->id)->first();
+
             switch ($r->Type) {
                 case 'wish':
                     $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
@@ -436,10 +438,12 @@ class CompanyController extends Controller
             $rdate = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
             if ($rdate == null) {
                 $up = DB::table('requestdates')->insert([
+                    'WhoAddedDate' => Auth::user()->id,
                     'RequestID' => $request->RID,
                     'date1' => $request->date1,
                     'date2' => $request->date2,
                     'date3' => $request->date3,
+                    'Note' => $request->Note,
                 ]);
 
 
@@ -463,7 +467,8 @@ class CompanyController extends Controller
     {
         $request->validate([
             'Code' => 'required',
-            'RID' => 'required'
+            'RID' => 'required',
+            'PostCompanyName' => 'required',
         ]);
 
         $r = DB::table('requests')->where('id', '=', $request->RID)->where(function ($query) {
@@ -479,12 +484,12 @@ class CompanyController extends Controller
                     $w = DB::table('wishs')->where('id', '=', $r->RID)->first();
                     $c = DB::table('categories')->where('id', '=', $w->Category)->first();
                     if ($c->Type == 1) {
-                        return $this->addpost($request->Code, $request->RID);
+                        return $this->addpost($request->Code, $request->RID, $request->PostCompanyName);
                     } else {
                         return response()->json(['status' => 203, 'message' => 'This Request does not require a physical product']);
                     }
                 } elseif ($r->Type == 'product') {
-                    return $this->addpost($request->Code, $request->RID);
+                    return $this->addpost($request->Code, $request->RID, $request->PostCompanyName);
                 } else {
                     return response()->json(['status' => 203, 'message' => 'This Request does not require a physical product']);
                 }
@@ -493,11 +498,12 @@ class CompanyController extends Controller
             return response()->json(['status' => 203, 'message' => 'Request Not Exists']);
         }
     }
-    public function addpost($Code, $RID)
+    public function addpost($Code, $RID, $PostCompanyName)
     {
         $q = DB::table('tracklists')->insertGetId([
             'TrackCode' => $Code,
             'RID' => $RID,
+            'PostCompanyName' => $PostCompanyName,
             'SenderID' => Auth::user()->id,
             'Status' => 3,
         ]);
@@ -521,6 +527,14 @@ class CompanyController extends Controller
         $r = DB::table('requests')->where('id', '=', $request->RID)->first();
 
         if ($r) {
+
+            $check = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where(function ($query) {
+                $query->where('AdminStatus', '=', 1)->orWhere('CompanyStatus', '=', 1)->orWhere('FilmmakerStatus', '=', 1);
+            });
+
+            if ($check->count() != 0) {
+                return response()->json(['status' => 203, 'message' => 'This Request Allready Has A Film Maker']);
+            }
 
             $w = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('CompanyStatus', '=', 1)->first();
 
@@ -568,6 +582,31 @@ class CompanyController extends Controller
             }
         } else {
             return response()->json(['status' => 203, 'message' => 'This Request Not Exists']);
+        }
+    }
+
+    function acceptdate(Request $request)
+    {
+        $request->validate([
+            'RID' => 'required'
+        ]);
+
+        $r = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
+        if ($r && $r->WhoAddedDate != Auth::user()->id) {
+            $request->validate([
+                'SelectDate' => 'required'
+            ]);
+
+            $rp = DB::table('requestdates')->where('RequestID', '=', $request->RID)->update([
+                'CompanyDate' => $request->SelectDate,
+            ]);
+            if ($rp) {
+                return response()->json(['status' => 200, 'message' => 'Your Selected Date Saved']);
+            } else {
+                return response()->json(['status' => 200, 'message' => 'Saved Date Faild']);
+            }
+        } else {
+            return response()->json(['status' => 203, 'message' => 'You Added Date Before']);
         }
     }
 }

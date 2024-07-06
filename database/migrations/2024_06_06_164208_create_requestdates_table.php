@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('requestdates', function (Blueprint $table) {
             $table->id();
+            $table->integer('WhoAddedDate');
             $table->integer('RequestID');
             $table->string('Date1');
             $table->string('Date2');
             $table->string('Date3');
+            $table->string('Note')->nullable();
             $table->text('CompanyDate')->nullable();
             $table->text('ClientDate')->nullable();
             $table->timestamps();

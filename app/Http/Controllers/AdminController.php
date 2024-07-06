@@ -266,10 +266,12 @@ class AdminController extends Controller
             $rdate = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
             if ($rdate == null) {
                 $up = DB::table('requestdates')->insert([
+                    'WhoAddedDate' => Auth::user()->id,
                     'RequestID' => $request->RID,
                     'date1' => $request->date1,
                     'date2' => $request->date2,
                     'date3' => $request->date3,
+                    'Note' => $request->Note,
                 ]);
 
 
@@ -311,6 +313,14 @@ class AdminController extends Controller
         $r = DB::table('requests')->where('id', '=', $request->RID)->first();
 
         if ($r) {
+
+            $check = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where(function ($query) {
+                $query->where('AdminStatus', '=', 1)->orWhere('CompanyStatus', '=', 1)->orWhere('FilmmakerStatus', '=', 1);
+            });
+
+            if ($check->count() != 0) {
+                return response()->json(['status' => 203, 'message' => 'This Request Allready Has A Film Maker']);
+            }
 
             $w = DB::table('whomakefilm')->where('RID', '=', $request->RID)->where('AdminStatus', '=', 1)->first();
 
