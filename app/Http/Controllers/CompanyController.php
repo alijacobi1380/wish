@@ -8,6 +8,7 @@ use App\Http\Requests\SendService;
 use App\Http\Requests\SendTicket;
 use App\Models\tickets;
 use App\Models\User;
+use Carbon\Carbon;
 use Dotenv\Validator;
 use Faker\Core\File;
 use Illuminate\Http\Request;
@@ -427,6 +428,7 @@ class CompanyController extends Controller
             'date1' => 'required',
             'date2' => 'required',
             'date3' => 'required',
+            'Time' => Carbon::now()->format('Y-m-d'),
         ]);
 
         $who = DB::table('whomakefilm')->where('RID', '=', $request->RID)->first();

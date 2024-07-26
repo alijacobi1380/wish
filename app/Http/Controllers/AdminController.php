@@ -7,6 +7,7 @@ use App\Http\Requests\SendCategory;
 use App\Http\Requests\SendTicket;
 use App\Models\tickets;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -272,6 +273,7 @@ class AdminController extends Controller
                     'date2' => $request->date2,
                     'date3' => $request->date3,
                     'Note' => $request->Note,
+                    'Time' => Carbon::now()->format('Y-m-d'),
                 ]);
 
 

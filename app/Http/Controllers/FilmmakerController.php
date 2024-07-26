@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +17,7 @@ class FilmmakerController extends Controller
             'date1' => 'required',
             'date2' => 'required',
             'date3' => 'required',
+            'Time' => Carbon::now()->format('Y-m-d'),
         ]);
 
         $who = DB::table('whomakefilm')->where('RID', '=', $request->RID)->first();
@@ -134,7 +137,97 @@ class FilmmakerController extends Controller
 
     function requestlist()
     {
-        $requests = DB::table('whomakefilm')->where('AdminStatus', '=', 0)->where('CompanyStatus', '=', 0)->get();
-        return response()->json(['status' => 200, 'Requests' => $requests]);
+        $whos = DB::table('whomakefilm')->where('AdminStatus', '=', 0)->where('CompanyStatus', '=', 0)->orWhere('FilmmakerStatus', '=', 1)->where('UserID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+
+
+
+
+
+
+        // return $whos;
+        // $requests = [];
+
+
+
+        foreach ($whos as $key => $w) {
+            $requests[$key] = DB::table('requests')->where('id', '=', $w->RID)->orderBy('id', 'DESC')->first();
+
+
+
+
+
+            $r = DB::table('requests')->where('id', '=', $w->RID)->orderBy('id', 'DESC')->first();
+            if ($r) {
+
+                $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
+                $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+                $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
+                $requests[$key]->Whowmakefilm = DB::table('whomakefilm')->where('RID', '=', $r->id)->first();
+
+                switch ($r->Type) {
+                    case 'wish':
+                        $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
+                        if ($rd != null) {
+
+                            $rd->Files = unserialize($rd->Files);
+                        }
+                        $requests[$key]->RequestDetail = $rd;
+                        break;
+                    case 'product':
+                        $rd = DB::table('products')->where('id', '=', $r->RID)->first();
+                        if ($rd != null) {
+
+                            $rd->Pics = unserialize($rd->Pics);
+                        }
+                        $requests[$key]->RequestDetail = $rd;
+                        break;
+                    case 'service':
+                        $rd = DB::table('services')->where('id', '=', $r->RID)->first();
+                        if ($rd != null) {
+
+                            $rd->Pics = unserialize($rd->Pics);
+                        }
+                        $requests[$key]->RequestDetail = $rd;
+                        break;
+                }
+            }
+        }
+
+        if (isset($requests)) {
+            return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+        } else {
+            return response()->json(['Status' => 200, 'Requests' => []], 200);
+        }
+    }
+
+    function accepttrack($id)
+    {
+        $q = DB::table('tracklists')->where('id', '=', $id)->update([
+            'FilmmakerID' => Auth::user()->id,
+            'Status' => 1,
+        ]);
+
+        $q2 = DB::table('tracklists')->where('id', '=', $id)->first();
+
+        $r = DB::table('requests')->where('id', '=', $q2->RID)->update([
+            'Status' => 4,
+        ]);
+
+
+        if (isset($q) && isset($r)) {
+            return response()->json(['status' => 200, 'messages' => 'Track Is Accepted']);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Track Code Faild']);
+        }
+    }
+
+    function TrackList()
+    {
+        $tracklist = DB::table('tracklists')->get();
+        $tracklist->map(function ($item) {
+            $item->senderDetail = User::where('id', '=', $item->SenderID)->first();
+            $item->requestDetail = DB::table('requests')->where('id', '=', $item->RID)->first();
+        });
+        return $tracklist;
     }
 }

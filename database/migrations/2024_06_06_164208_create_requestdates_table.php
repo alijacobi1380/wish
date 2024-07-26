@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('Note')->nullable();
             $table->text('CompanyDate')->nullable();
             $table->text('ClientDate')->nullable();
+            $table->text('Time')->nullable();
             $table->timestamps();
         });
     }

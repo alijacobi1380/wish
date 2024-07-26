@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
+
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         return $request->user();
     });
@@ -165,5 +166,9 @@ Route::prefix('v1')->group(function () {
         // Accept Film
         Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
         Route::get('requestlist', 'requestlist')->name('requestlist');
+
+        // Post Track
+        Route::get('accepttrack/{id}', 'accepttrack')->name('accepttrack');
+        Route::get('tracklist', 'TrackList')->name('TrackList');
     });
 });
