@@ -284,11 +284,11 @@ class ClientController extends Controller
         if ($r) {
             $rs = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
             if ($rs->ClientDate === $rs->CompanyDate) {
-                DB::table('requests')->where('RID', '=', $request->RID)->update([
-                    'Status' => 4
+                DB::table('requests')->where('id', '=', $request->RID)->update([
+                    'Status' => 5
                 ]);
             } else {
-                DB::table('requests')->where('RID', '=', $request->RID)->update([
+                DB::table('requests')->where('id', '=', $request->RID)->update([
                     'Status' => 3
                 ]);
             }
@@ -310,6 +310,27 @@ class ClientController extends Controller
             'ClientDate' => $request->SelectDate,
         ]);
         if ($rp) {
+            $rs = DB::table('requestdates')->where('RequestID', '=', $request->RID)->first();
+            $whoadded = DB::table('users')->where('id', '=', $rs->WhoAddedDate)->first();
+            if ($whoadded->role == 'Company') {
+                if ($rs->ClientDate == $rs->Date1 || $rs->ClientDate == $rs->Date2 || $rs->ClientDate == $rs->Date3) {
+                    DB::table('requests')->where('id', '=', $request->RID)->update([
+                        'Status' => 5
+                    ]);
+                }
+            } else {
+                if ($rs->ClientDate == $rs->CompanyDate) {
+                    DB::table('requests')->where('id', '=', $request->RID)->update([
+                        'Status' => 5
+                    ]);
+                } else {
+                    DB::table('requests')->where('id', '=', $request->RID)->update([
+                        'Status' => 3
+                    ]);
+                }
+            }
+
+
             return response()->json(['status' => 200, 'message' => 'Your Selected Date Saved']);
         } else {
             return response()->json(['status' => 200, 'message' => 'Saved Date Faild']);

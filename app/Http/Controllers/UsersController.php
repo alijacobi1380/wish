@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Requests\Base\LoginRequest;
 use App\Http\Requests\Base\RegisterRequest;
 use App\Http\Requests\changepassword;
@@ -156,7 +157,7 @@ class UsersController extends Controller
             $data = asset('files/usersimg') . '/' . $name;
             $requestData["profilepicture"] = $data;
         }
-        
+
         // return $request->profilepicture;
 
         if (Auth::user()->role == 'Company') {

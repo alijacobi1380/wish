@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Notification_helper;
 use App\Http\Requests\ReplayTicket;
 use App\Http\Requests\SendCategory;
 use App\Http\Requests\SendTicket;
@@ -121,6 +122,9 @@ class AdminController extends Controller
         );
 
         if ($ticket) {
+            $ticket = DB::table('tickets')->where('id', '=', $id)->first();
+            addnotif($ticket->SenderID, Auth::user()->name . ' Is Replay Your Ticket');
+
             return response()->json(['status' => 200, 'messages' => 'Replay Added', 'TicketID' => $ticket]);
         } else {
             return response()->json(['status' => 203, 'message' => 'Replay Added Faild']);
@@ -370,6 +374,25 @@ class AdminController extends Controller
             }
         } else {
             return response()->json(['status' => 203, 'message' => 'This Request Not Exists']);
+        }
+    }
+
+    function addfilmlink(Request $request)
+    {
+        $request->validate([
+            'RID' => 'required',
+            'Link' => 'required'
+        ]);
+
+
+        $rp = DB::table('requests')->where('ID', '=', $request->RID)->first();
+        if ($rp->Status == 5) {
+            $rp = DB::table('requests')->where('ID', '=', $request->RID)->update([
+                'VideoLink' => $request->Link,
+            ]);
+            return response()->json(['status' => 200, 'message' => 'Video Link Added']);
+        } else {
+            return response()->json(['status' => 203, 'message' => 'Video Link Added Faild']);
         }
     }
 }

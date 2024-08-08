@@ -91,6 +91,7 @@ Route::prefix('v1')->group(function () {
 
         // Accept Film
         Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
+        Route::post('addfilmlink', 'addfilmlink')->name('addfilmlink');
     });
 
 
