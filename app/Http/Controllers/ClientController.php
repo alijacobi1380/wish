@@ -223,6 +223,8 @@ class ClientController extends Controller
                     'ReceiverID' => $user->id,
                     'Status' => $status,
                 ]);
+                addnotif($user->id, Auth::user()->name . ' Added Request For You. Request ID :' . $r, $r);
+
                 return response()->json(['status' => 200, 'message' => 'Request Added Successful', 'requestID' => $r]);
             } else {
                 return response()->json(['status' => 203, 'message' => 'This Service Or Product ID Is Not Existed']);
@@ -292,6 +294,13 @@ class ClientController extends Controller
                     'Status' => 3
                 ]);
             }
+            $rn = DB::table('requests')->where('id', '=', $request->RID)->first();
+            if ($rn->SenderID == Auth::user()->id) {
+                addnotif($rn->ReceiverID, Auth::user()->name . ' Added Date. Request ID :' . $request->RID, $request->RID);
+            } else {
+                addnotif($rn->SenderID, Auth::user()->name . ' Added Date. Request ID :' . $request->RID, $request->RID);
+            }
+
             return response()->json(['status' => 200, 'messages' => 'Your Selected Dated Saved']);
         } else {
             return response()->json(['status' => 203, 'message' => 'Your Selected Dated Faild']);
@@ -330,10 +339,33 @@ class ClientController extends Controller
                 }
             }
 
-
+            $rn = DB::table('requests')->where('id', '=', $request->RID)->first();
+            if ($rn->SenderID == Auth::user()->id) {
+                addnotif($rn->ReceiverID, Auth::user()->name . ' Accepted Date. Request ID :' . $request->RID, $request->RID);
+            } else {
+                addnotif($rn->SenderID, Auth::user()->name . ' Accepted Date. Request ID :' . $request->RID, $request->RID);
+            }
+            $rw = DB::table('whomakefilm')->where('RID', '=', $request->RID)->first();
+            addnotif($rw->UserID, Auth::user()->name . ' Accepted Date. Request ID :' . $request->RID);
             return response()->json(['status' => 200, 'message' => 'Your Selected Date Saved']);
         } else {
             return response()->json(['status' => 200, 'message' => 'Saved Date Faild']);
         }
+    }
+
+    function getnotifications()
+    {
+        $notifications = DB::table('notifications')->where('UserID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        DB::table('notifications')->where('UserID', '=', Auth::user()->id)->where('Seen', '=', 0)->update([
+            'Seen' => 1,
+        ]);
+        return response()->json(['Status' => 200, 'Notifications' => $notifications], 200);
+    }
+
+    function getnotificationscount()
+    {
+        $notificationcount = DB::table('notifications')->where('UserID', '=', Auth::user()->id)->where('Seen', '=', 0)->count();
+
+        return response()->json(['Status' => 200, 'Notificationcount' => $notificationcount], 200);
     }
 }

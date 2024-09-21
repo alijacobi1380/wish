@@ -245,4 +245,44 @@ class UsersController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['status' => 200, 'message' => 'Your Logout Success'], 200);
     }
+
+    function requestslistglobal()
+    {
+        $requests = DB::table('requests')->whereNotNull('VideoLink')->orderBy('id', 'DESC')->get();
+
+        foreach ($requests as $key => $r) {
+            $requests[$key]->SenderUser = User::where('id', '=', $r->SenderID)->first();
+            $requests[$key]->ReceiverUser = User::where('id', '=', $r->ReceiverID)->first();
+            $requests[$key]->Dates = DB::table('requestdates')->where('RequestID', '=', $r->id)->first();
+            $requests[$key]->Whowmakefilm = DB::table('whomakefilm')->where('RID', '=', $r->id)->first();
+            switch ($r->Type) {
+                case 'wish':
+                    $rd = DB::table('wishs')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Files = unserialize($rd->Files);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'product':
+                    $rd = DB::table('products')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+                case 'service':
+                    $rd = DB::table('services')->where('id', '=', $r->RID)->first();
+                    if ($rd != null) {
+
+                        $rd->Pics = unserialize($rd->Pics);
+                    }
+                    $requests[$key]->RequestDetail = $rd;
+                    break;
+            }
+        }
+
+        return response()->json(['Status' => 200, 'Requests' => $requests], 200);
+    }
 }

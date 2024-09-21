@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->integer('UserID');
+            $table->integer('RID')->nullable();
             $table->text('Text');
             $table->string('Date');
+            $table->integer('Seen')->default(0);
             $table->timestamps();
         });
     }

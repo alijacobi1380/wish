@@ -53,6 +53,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/register', [UsersController::class, 'register']);
 
     // Global Routes
+    Route::get('/requestslistglobal', [UsersController::class, 'requestslistglobal']);
     Route::get('categorielist', [UsersController::class, 'categorielist'])->name('categorielist');
     Route::get('productlist', [UsersController::class, 'productlist'])->name('productlist');
     Route::get('servicelist', [UsersController::class, 'servicelist'])->name('servicelist');
@@ -92,6 +93,10 @@ Route::prefix('v1')->group(function () {
         // Accept Film
         Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
         Route::post('addfilmlink', 'addfilmlink')->name('addfilmlink');
+
+        // Notifications
+        Route::get('getnotifications', 'getnotifications')->name('getnotifications');
+        Route::get('getnotificationscount', 'getnotificationscount')->name('getnotificationscount');
     });
 
 
@@ -129,6 +134,10 @@ Route::prefix('v1')->group(function () {
 
         // Accept Film
         Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
+
+        // Notifications
+        Route::get('getnotifications', 'getnotifications')->name('getnotifications');
+        Route::get('getnotificationscount', 'getnotificationscount')->name('getnotificationscount');
     });
 
 
@@ -156,6 +165,10 @@ Route::prefix('v1')->group(function () {
 
         // Accept Film
         Route::post('acceptfilm', 'acceptfilm')->name('acceptfilm');
+
+        // Notifications
+        Route::get('getnotifications', 'getnotifications')->name('getnotifications');
+        Route::get('getnotificationscount', 'getnotificationscount')->name('getnotificationscount');
     });
 
     Route::name('filmmaker.')->prefix('filmmaker')->controller(FilmmakerController::class)->middleware(['Filmmaker', 'auth:sanctum', 'verified'])->group(function () {
@@ -171,5 +184,9 @@ Route::prefix('v1')->group(function () {
         // Post Track
         Route::get('accepttrack/{id}', 'accepttrack')->name('accepttrack');
         Route::get('tracklist', 'TrackList')->name('TrackList');
+
+        // Notifications
+        Route::get('getnotifications', 'getnotifications')->name('getnotifications');
+        Route::get('getnotificationscount', 'getnotificationscount')->name('getnotificationscount');
     });
 });

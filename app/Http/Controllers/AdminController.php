@@ -123,7 +123,7 @@ class AdminController extends Controller
 
         if ($ticket) {
             $ticket = DB::table('tickets')->where('id', '=', $id)->first();
-            addnotif($ticket->SenderID, Auth::user()->name . ' Is Replay Your Ticket');
+            addnotif($ticket->SenderID, Auth::user()->name . ' Is Replay Your Ticket', $ticket->id);
 
             return response()->json(['status' => 200, 'messages' => 'Replay Added', 'TicketID' => $ticket]);
         } else {
@@ -204,6 +204,10 @@ class AdminController extends Controller
                 DB::table('requests')->where('RID', '=', $request->RID)->update([
                     'status' => 2,
                 ]);
+                $rn = DB::table('requests')->where('RID', '=', $request->RID)->first();
+                addnotif($rn->SenderID, Auth::user()->name . ' Updated Your Request. Request ID :' . $request->id, $request->id);
+                addnotif($rn->ReceiverID, Auth::user()->name . ' Updated Your Request. Request ID :' . $request->id, $request->id);
+
                 return response()->json(['status' => 200, 'messages' => 'Update Requested']);
             } else {
                 return response()->json(['status' => 203, 'message' => 'Update Requested Faild']);
@@ -234,8 +238,12 @@ class AdminController extends Controller
             'Status' => 4,
         ]);
 
+        $rid = DB::table('requests')->where('id', '=', $q2->RID)->first();
+
 
         if (isset($q) && isset($r)) {
+            addnotif($q2->SenderID, Auth::user()->name . ' Accepted The Track. Track ID :' . $id, $rid->RID);
+
             return response()->json(['status' => 200, 'messages' => 'Track Is Accepted']);
         } else {
             return response()->json(['status' => 203, 'message' => 'Track Code Faild']);
@@ -285,6 +293,10 @@ class AdminController extends Controller
                     DB::table('requests')->where('RID', '=', $request->RID)->update([
                         'status' => 2,
                     ]);
+                    $rn = DB::table('requests')->where('id', '=', $request->RID)->first();
+                    addnotif($rn->SenderID, Auth::user()->name . ' Added Date To Your Request. Request ID :' . $request->RID, $request->RID);
+                    addnotif($rn->ReceiverID, Auth::user()->name . ' Added Date To Your Request. Request ID :' . $request->RID, $request->RID);
+
                     return response()->json(['status' => 200, 'messages' => 'Update Requested']);
                 } else {
                     return response()->json(['status' => 203, 'message' => 'Update Requested Faild']);
@@ -362,6 +374,9 @@ class AdminController extends Controller
 
                 if ($q) {
                     if ($request->status == 1) {
+                        addnotif($r->SenderID, Auth::user()->name . ' Accept To Make Film. Request ID :' . $request->RID, $request->RID);
+                        addnotif($r->ReceiverID, Auth::user()->name . ' Accept To Make Film. Request ID :' . $request->RID, $request->RID);
+
                         return response()->json(['status' => 200, 'messages' => 'You Accept To Make Film']);
                     } else {
                         return response()->json(['status' => 200, 'messages' => 'You Not Accept To Make Film']);
@@ -394,5 +409,20 @@ class AdminController extends Controller
         } else {
             return response()->json(['status' => 203, 'message' => 'Video Link Added Faild']);
         }
+    }
+    function getnotifications()
+    {
+        $notifications = DB::table('notifications')->where('UserID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        DB::table('notifications')->where('UserID', '=', Auth::user()->id)->where('Seen', '=', 0)->update([
+            'Seen' => 1,
+        ]);
+        return response()->json(['Status' => 200, 'Notifications' => $notifications], 200);
+    }
+
+    function getnotificationscount()
+    {
+        $notificationcount = DB::table('notifications')->where('UserID', '=', Auth::user()->id)->where('Seen', '=', 0)->count();
+
+        return response()->json(['Status' => 200, 'Notificationcount' => $notificationcount], 200);
     }
 }

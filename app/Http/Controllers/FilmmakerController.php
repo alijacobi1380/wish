@@ -43,6 +43,11 @@ class FilmmakerController extends Controller
                     DB::table('requests')->where('RID', '=', $request->RID)->update([
                         'status' => 2,
                     ]);
+
+                    $rn = DB::table('requests')->where('RID', '=', $request->RID)->first();
+                    addnotif($rn->SenderID, Auth::user()->name . ' Added Date To Your Request. Request ID :' . $request->RID, $request->RID);
+                    addnotif($rn->ReceiverID, Auth::user()->name . ' Added Date To Your Request. Request ID :' . $request->RID, $request->RID);
+
                     return response()->json(['status' => 200, 'messages' => 'Update Requested']);
                 } else {
                     return response()->json(['status' => 203, 'message' => 'Update Requested Faild']);
@@ -120,6 +125,10 @@ class FilmmakerController extends Controller
 
                 if ($q) {
                     if ($request->status == 1) {
+                        $rn = DB::table('requests')->where('RID', '=', $request->RID)->first();
+                        addnotif($rn->SenderID, Auth::user()->name . ' Accepted To Make Film. Request ID :' . $request->RID, $request->RID);
+                        addnotif($rn->ReceiverID, Auth::user()->name . ' Accepted To Make Film. Request ID :' . $request->RID, $request->RID);
+
                         return response()->json(['status' => 200, 'messages' => 'You Accept To Make Film']);
                     } else {
                         return response()->json(['status' => 200, 'messages' => 'You Not Accept To Make Film']);
@@ -212,9 +221,12 @@ class FilmmakerController extends Controller
         $r = DB::table('requests')->where('id', '=', $q2->RID)->update([
             'Status' => 4,
         ]);
+        $rid = DB::table('requests')->where('id', '=', $q2->RID)->first();
 
 
         if (isset($q) && isset($r)) {
+            addnotif($q2->SenderID, Auth::user()->name . ' Accepted The Track. Track ID :' . $id, $rid->RID);
+
             return response()->json(['status' => 200, 'messages' => 'Track Is Accepted']);
         } else {
             return response()->json(['status' => 203, 'message' => 'Track Code Faild']);
@@ -229,5 +241,21 @@ class FilmmakerController extends Controller
             $item->requestDetail = DB::table('requests')->where('id', '=', $item->RID)->first();
         });
         return $tracklist;
+    }
+
+    function getnotifications()
+    {
+        $notifications = DB::table('notifications')->where('UserID', '=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        DB::table('notifications')->where('UserID', '=', Auth::user()->id)->where('Seen', '=', 0)->update([
+            'Seen' => 1,
+        ]);
+        return response()->json(['Status' => 200, 'Notifications' => $notifications], 200);
+    }
+
+    function getnotificationscount()
+    {
+        $notificationcount = DB::table('notifications')->where('UserID', '=', Auth::user()->id)->where('Seen', '=', 0)->count();
+
+        return response()->json(['Status' => 200, 'Notificationcount' => $notificationcount], 200);
     }
 }
