@@ -494,6 +494,8 @@ class CompanyController extends Controller
                     $w = DB::table('wishs')->where('id', '=', $r->RID)->first();
                     $c = DB::table('categories')->where('id', '=', $w->Category)->first();
                     if ($c->Type == 1) {
+                        $whomakefilm = DB::table('whomakefilm')->where('RID', '=', $request->RID)->first();
+                        addnotif($whomakefilm->UserID, Auth::user()->name . ' Added Track Post. Request ID :' . $whomakefilm->RID, $whomakefilm->RID);
                         return $this->addpost($request->Code, $request->RID, $request->PostCompanyName);
                     } else {
                         return response()->json(['status' => 203, 'message' => 'This Request does not require a physical product']);
